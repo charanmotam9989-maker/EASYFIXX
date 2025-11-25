@@ -17,8 +17,8 @@ export interface CustomerReviews {
   rating?: number;
   /** @wixFieldType text */
   reviewerName?: string;
-  /** @wixFieldType datetime @format {$date: "ISO_STRING"} (e.g., {$date: "2024-03-10T00:00:00Z"}) */
-  submissionDate?: { $date: string };
+  /** @wixFieldType datetime */
+  submissionDate?: Date | string;
   /** @wixFieldType boolean */
   isVerified?: boolean;
 }
@@ -42,8 +42,8 @@ export interface ServiceBookings {
   customerName?: string;
   /** @wixFieldType text */
   customerEmail?: string;
-  /** @wixFieldType date @format YYYY-MM-DD */
-  bookingDate?: string;
+  /** @wixFieldType date */
+  bookingDate?: Date | string;
   /** @wixFieldType time */
   bookingTime?: any;
   /** @wixFieldType text */
