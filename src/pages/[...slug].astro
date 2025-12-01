@@ -2,6 +2,7 @@
 import { SEO } from '@wix/seo/components';
 import { loadSEOTagsServiceConfig } from '@wix/seo/services';
 import { Head } from "@/components/Head";
+import AppRouter from "@/components/Router";
 import "@wix/wix-vibe-plugins/plugins-vars.css";
 import "@wix/wix-vibe-plugins/plugins-theme.css";
 import "@/styles/global.css";
@@ -25,14 +26,3 @@ const seoTagsServiceConfig = await loadSEOTagsServiceConfig({
     </div>
   </body>
 </html>
-
-<script>
-  import AppRouter from "@/components/Router";
-  import { createRoot } from "react-dom/client";
-
-  const root = document.getElementById("root");
-  if (root) {
-    const reactRoot = createRoot(root);
-    reactRoot.render(AppRouter({}));
-  }
-</script>
