@@ -17,6 +17,7 @@ import BookingsPage from '@/components/pages/BookingsPage';
 import ReviewsPage from '@/components/pages/ReviewsPage';
 import ProfilePage from '@/components/pages/ProfilePage';
 import ProviderDashboardPage from '@/components/pages/ProviderDashboardPage';
+import AdminApprovalsPage from '@/components/pages/AdminApprovalsPage';
 
 // Layout component that includes ScrollToTop
 function AppLayout() {
@@ -93,6 +94,10 @@ const router = createBrowserRouter([
             <ProviderDashboardPage />
           </MemberProtectedRoute>
         ),
+      },
+      {
+        path: "admin/approvals",
+        element: <AdminApprovalsPage />,
       },
       {
         path: "*",

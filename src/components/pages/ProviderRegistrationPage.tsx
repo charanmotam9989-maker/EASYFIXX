@@ -179,7 +179,8 @@ export default function ProviderRegistrationPage() {
         profilePicture: formData.profilePicture.trim() || undefined,
         servicesOffered: formData.servicesOffered.join(','),
         isAvailable: true,
-        memberId: crypto.randomUUID()
+        memberId: crypto.randomUUID(),
+        approvalStatus: 'Pending'
       } as ServiceProviders;
 
       await BaseCrudService.create('serviceproviders', newProvider);

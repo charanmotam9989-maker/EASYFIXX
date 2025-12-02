@@ -81,6 +81,12 @@ export interface ServiceProviders {
   isAvailable?: boolean;
   /** @wixFieldType text */
   memberId?: string;
+  /** @wixFieldType text */
+  approvalStatus?: string;
+  /** @wixFieldType text */
+  rejectionReason?: string;
+  /** @wixFieldType datetime */
+  approvalDate?: Date | string;
 }
 
 
