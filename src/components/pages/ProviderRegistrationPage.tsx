@@ -55,10 +55,47 @@ export default function ProviderRegistrationPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.agreeToTerms || !formData.agreeToBackground) {
+    // Validate required fields
+    if (!formData.providerName.trim()) {
       toast({
-        title: "Agreement Required",
-        description: "Please agree to all terms and conditions to proceed.",
+        title: "Full Name Required",
+        description: "Please enter your full name.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.email.trim()) {
+      toast({
+        title: "Email Required",
+        description: "Please enter your email address.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.phoneNumber.trim()) {
+      toast({
+        title: "Phone Number Required",
+        description: "Please enter your phone number.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.yearsOfExperience) {
+      toast({
+        title: "Experience Required",
+        description: "Please enter your years of experience.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.bio.trim()) {
+      toast({
+        title: "Bio Required",
+        description: "Please provide a professional bio.",
         variant: "destructive",
       });
       return;
@@ -72,18 +109,27 @@ export default function ProviderRegistrationPage() {
       });
       return;
     }
+    
+    if (!formData.agreeToTerms || !formData.agreeToBackground) {
+      toast({
+        title: "Agreement Required",
+        description: "Please agree to all terms and conditions to proceed.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setIsSubmitting(true);
 
     try {
       const newProvider = {
         _id: crypto.randomUUID(),
-        providerName: formData.providerName,
-        email: formData.email,
-        phoneNumber: formData.phoneNumber,
-        bio: formData.bio,
+        providerName: formData.providerName.trim(),
+        email: formData.email.trim(),
+        phoneNumber: formData.phoneNumber.trim(),
+        bio: formData.bio.trim(),
         yearsOfExperience: parseInt(formData.yearsOfExperience) || 0,
-        profilePicture: formData.profilePicture || undefined,
+        profilePicture: formData.profilePicture.trim() || undefined,
         servicesOffered: formData.servicesOffered.join(','),
         isAvailable: true
       } as ServiceProviders;
@@ -108,6 +154,7 @@ export default function ProviderRegistrationPage() {
         agreeToBackground: false
       });
     } catch (error) {
+      console.error('Submission error:', error);
       toast({
         title: "Registration Failed",
         description: "There was an error submitting your application. Please try again.",
