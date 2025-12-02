@@ -10,6 +10,9 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { UserPlus, Shield, Star, DollarSign } from 'lucide-react';
 
+// Admin email address for notifications
+const ADMIN_EMAIL = 'admin@easyfix.com';
+
 export default function ProviderRegistrationPage() {
   const { toast } = useToast();
   const [formData, setFormData] = useState({
@@ -50,6 +53,50 @@ export default function ProviderRegistrationPage() {
         ? prev.servicesOffered.filter(id => id !== serviceId)
         : [...prev.servicesOffered, serviceId]
     }));
+  };
+
+  const sendAdminNotificationEmail = async (provider: ServiceProviders) => {
+    try {
+      const emailContent = `
+        <h2>New Provider Registration Application</h2>
+        <p>A new service provider has submitted their application for review.</p>
+        
+        <h3>Provider Information:</h3>
+        <ul>
+          <li><strong>Name:</strong> ${provider.providerName}</li>
+          <li><strong>Email:</strong> ${provider.email}</li>
+          <li><strong>Phone:</strong> ${provider.phoneNumber}</li>
+          <li><strong>Years of Experience:</strong> ${provider.yearsOfExperience}</li>
+          <li><strong>Services Offered:</strong> ${provider.servicesOffered}</li>
+          <li><strong>Bio:</strong> ${provider.bio}</li>
+          <li><strong>Profile Picture:</strong> ${provider.profilePicture || 'Not provided'}</li>
+          <li><strong>Application Date:</strong> ${new Date().toLocaleString()}</li>
+        </ul>
+        
+        <p>Please review this application and contact the provider to proceed with the verification process.</p>
+      `;
+
+      // Send email using fetch to a backend endpoint
+      const response = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          to: ADMIN_EMAIL,
+          subject: `New Provider Registration: ${provider.providerName}`,
+          html: emailContent,
+          replyTo: provider.email,
+        }),
+      });
+
+      if (!response.ok) {
+        console.error('Failed to send email notification');
+      }
+    } catch (error) {
+      console.error('Error sending email notification:', error);
+      // Don't throw error - email notification failure shouldn't block registration
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -135,6 +182,9 @@ export default function ProviderRegistrationPage() {
       } as ServiceProviders;
 
       await BaseCrudService.create('serviceproviders', newProvider);
+      
+      // Send admin notification email
+      await sendAdminNotificationEmail(newProvider);
       
       toast({
         title: "Registration Successful!",
