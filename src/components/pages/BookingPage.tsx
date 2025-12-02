@@ -75,6 +75,70 @@ export default function BookingPage() {
     setBookingData(prev => ({ ...prev, [field]: value }));
   };
 
+  const sendProviderNotificationEmail = async (
+    providerEmail: string,
+    providerName: string,
+    bookingDetails: {
+      customerName: string;
+      customerEmail: string;
+      serviceName?: string;
+      bookingDate?: Date;
+      bookingTime: string;
+      serviceAddress: string;
+      notes?: string;
+      totalPrice?: number;
+    }
+  ) => {
+    try {
+      const emailContent = `
+        <h2>New Service Booking Notification</h2>
+        <p>You have received a new service booking request. Please review the details below:</p>
+        
+        <h3>Customer Information:</h3>
+        <ul>
+          <li><strong>Name:</strong> ${bookingDetails.customerName}</li>
+          <li><strong>Email:</strong> ${bookingDetails.customerEmail}</li>
+        </ul>
+        
+        <h3>Service Details:</h3>
+        <ul>
+          <li><strong>Service:</strong> ${bookingDetails.serviceName}</li>
+          <li><strong>Booking Date:</strong> ${bookingDetails.bookingDate ? format(bookingDetails.bookingDate, 'PPP') : 'Not specified'}</li>
+          <li><strong>Preferred Time:</strong> ${bookingDetails.bookingTime || 'Not specified'}</li>
+          <li><strong>Service Address:</strong> ${bookingDetails.serviceAddress}</li>
+          ${bookingDetails.totalPrice ? `<li><strong>Estimated Price:</strong> ₹${bookingDetails.totalPrice}</li>` : ''}
+        </ul>
+        
+        ${bookingDetails.notes ? `
+        <h3>Customer Notes:</h3>
+        <p>${bookingDetails.notes}</p>
+        ` : ''}
+        
+        <p><strong>Next Steps:</strong> Please contact the customer at ${bookingDetails.customerEmail} to confirm the appointment and discuss any additional details.</p>
+      `;
+
+      const response = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          to: providerEmail,
+          subject: `New Booking Request: ${bookingDetails.serviceName}`,
+          html: emailContent,
+          replyTo: bookingDetails.customerEmail,
+        }),
+      });
+
+      if (!response.ok) {
+        console.error('Failed to send provider notification email');
+      }
+    } catch (error) {
+      console.error('Error sending provider notification email:', error);
+      // Don't throw error - email notification failure shouldn't block booking
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -91,6 +155,15 @@ export default function BookingPage() {
       toast({
         title: "Date Required",
         description: "Please select a booking date.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!bookingData.serviceAddress.trim()) {
+      toast({
+        title: "Address Required",
+        description: "Please enter the service address.",
         variant: "destructive",
       });
       return;
@@ -116,6 +189,24 @@ export default function BookingPage() {
       } as ServiceBookings;
 
       await BaseCrudService.create('servicebookings', newBooking);
+      
+      // Send notification email to provider
+      if (selectedProviderData?.email) {
+        await sendProviderNotificationEmail(
+          selectedProviderData.email,
+          selectedProviderData.providerName || 'Service Provider',
+          {
+            customerName: bookingData.customerName,
+            customerEmail: bookingData.customerEmail,
+            serviceName: service?.serviceName,
+            bookingDate: bookingData.bookingDate,
+            bookingTime: bookingData.bookingTime,
+            serviceAddress: bookingData.serviceAddress,
+            notes: bookingData.notes,
+            totalPrice: service?.startingPrice
+          }
+        );
+      }
       
       toast({
         title: "Booking Confirmed!",
