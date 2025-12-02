@@ -178,7 +178,8 @@ export default function ProviderRegistrationPage() {
         yearsOfExperience: parseInt(formData.yearsOfExperience) || 0,
         profilePicture: formData.profilePicture.trim() || undefined,
         servicesOffered: formData.servicesOffered.join(','),
-        isAvailable: true
+        isAvailable: true,
+        memberId: crypto.randomUUID()
       } as ServiceProviders;
 
       await BaseCrudService.create('serviceproviders', newProvider);

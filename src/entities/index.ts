@@ -79,6 +79,8 @@ export interface ServiceProviders {
   yearsOfExperience?: number;
   /** @wixFieldType boolean */
   isAvailable?: boolean;
+  /** @wixFieldType text */
+  memberId?: string;
 }
 
 

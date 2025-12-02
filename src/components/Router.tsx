@@ -16,6 +16,7 @@ import BookingPage from '@/components/pages/BookingPage';
 import BookingsPage from '@/components/pages/BookingsPage';
 import ReviewsPage from '@/components/pages/ReviewsPage';
 import ProfilePage from '@/components/pages/ProfilePage';
+import ProviderDashboardPage from '@/components/pages/ProviderDashboardPage';
 
 // Layout component that includes ScrollToTop
 function AppLayout() {
@@ -82,6 +83,14 @@ const router = createBrowserRouter([
         element: (
           <MemberProtectedRoute messageToSignIn="Sign in to view your profile">
             <ProfilePage />
+          </MemberProtectedRoute>
+        ),
+      },
+      {
+        path: "provider-dashboard",
+        element: (
+          <MemberProtectedRoute messageToSignIn="Sign in to access your provider dashboard">
+            <ProviderDashboardPage />
           </MemberProtectedRoute>
         ),
       },

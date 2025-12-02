@@ -52,6 +52,9 @@ export default function Layout() {
                   <Link to="/bookings" className="font-paragraph text-darktext hover:text-primary transition-colors">
                     My Bookings
                   </Link>
+                  <Link to="/provider-dashboard" className="font-paragraph text-darktext hover:text-primary transition-colors">
+                    Provider Dashboard
+                  </Link>
                   <Link 
                     to="/profile" 
                     className="flex items-center space-x-2 text-darktext hover:text-primary transition-colors"
@@ -126,6 +129,13 @@ export default function Layout() {
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       My Bookings
+                    </Link>
+                    <Link
+                      to="/provider-dashboard"
+                      className="block font-paragraph text-darktext hover:text-primary transition-colors"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Provider Dashboard
                     </Link>
                     <Link
                       to="/profile"
