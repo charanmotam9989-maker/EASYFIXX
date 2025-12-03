@@ -7,6 +7,24 @@ interface EmailRequest {
   replyTo?: string;
 }
 
+interface SendGridEmailRequest {
+  personalizations: Array<{
+    to: Array<{ email: string }>;
+    subject: string;
+  }>;
+  from: {
+    email: string;
+    name: string;
+  };
+  content: Array<{
+    type: string;
+    value: string;
+  }>;
+  replyTo?: {
+    email: string;
+  };
+}
+
 export const POST: APIRoute = async ({ request }) => {
   try {
     // Only accept POST requests
@@ -36,25 +54,8 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
-    // TODO: Integrate with your email service provider
-    // Options:
-    // 1. SendGrid
-    // 2. Mailgun
-    // 3. AWS SES
-    // 4. Nodemailer
-    // 5. Wix Email API (if available)
-
-    // For now, we'll log the email details and return success
-    console.log('Email notification:', {
-      to: body.to,
-      subject: body.subject,
-      replyTo: body.replyTo,
-      timestamp: new Date().toISOString(),
-    });
-
-    // Simulate email sending
-    // In production, replace this with actual email service integration
-    const emailSent = await simulateSendEmail(body);
+    // Send email via SendGrid
+    const emailSent = await sendViaSendGrid(body);
 
     if (emailSent) {
       return new Response(
@@ -83,14 +84,67 @@ export const POST: APIRoute = async ({ request }) => {
   }
 };
 
-// Simulate email sending - replace with actual email service
-async function simulateSendEmail(emailData: EmailRequest): Promise<boolean> {
-  return new Promise((resolve) => {
-    // Simulate network delay
-    setTimeout(() => {
+// Send email via SendGrid
+async function sendViaSendGrid(emailData: EmailRequest): Promise<boolean> {
+  const sendGridApiKey = import.meta.env.SENDGRID_API_KEY;
+  
+  // Fallback to environment variable if not set
+  if (!sendGridApiKey) {
+    console.warn('SendGrid API key not configured. Falling back to console logging.');
+    console.log('Email notification:', {
+      to: emailData.to,
+      subject: emailData.subject,
+      timestamp: new Date().toISOString(),
+    });
+    return true;
+  }
+
+  const sendGridRequest: SendGridEmailRequest = {
+    personalizations: [
+      {
+        to: [{ email: emailData.to }],
+        subject: emailData.subject,
+      },
+    ],
+    from: {
+      email: 'noreply@easyfix.com',
+      name: 'EASYFIX',
+    },
+    content: [
+      {
+        type: 'text/html',
+        value: emailData.html,
+      },
+    ],
+  };
+
+  if (emailData.replyTo) {
+    sendGridRequest.replyTo = {
+      email: emailData.replyTo,
+    };
+  }
+
+  try {
+    const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${sendGridApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(sendGridRequest),
+    });
+
+    if (response.ok) {
       console.log(`✓ Email sent to ${emailData.to}`);
       console.log(`  Subject: ${emailData.subject}`);
-      resolve(true);
-    }, 500);
-  });
+      return true;
+    } else {
+      const errorData = await response.text();
+      console.error('SendGrid error:', response.status, errorData);
+      return false;
+    }
+  } catch (error) {
+    console.error('Error sending email via SendGrid:', error);
+    return false;
+  }
 }
