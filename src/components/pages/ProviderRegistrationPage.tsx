@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { BaseCrudService } from '@/integrations';
 import { ServiceProviders, Services } from '@/entities';
 import { Button } from '@/components/ui/button';
@@ -12,6 +13,7 @@ import { UserPlus, Shield, Star, DollarSign } from 'lucide-react';
 
 export default function ProviderRegistrationPage() {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     providerName: '',
     email: '',
@@ -140,21 +142,13 @@ export default function ProviderRegistrationPage() {
       
       toast({
         title: "Registration Successful!",
-        description: "Welcome to EASYFIX! You can now access your provider dashboard and start accepting bookings.",
+        description: "Welcome to EASYFIX! Redirecting to your provider dashboard...",
       });
       
-      // Reset form
-      setFormData({
-        providerName: '',
-        email: '',
-        phoneNumber: '',
-        bio: '',
-        yearsOfExperience: '',
-        profilePicture: '',
-        servicesOffered: [],
-        agreeToTerms: false,
-        agreeToBackground: false
-      });
+      // Redirect to provider dashboard after successful registration
+      setTimeout(() => {
+        navigate('/provider-dashboard');
+      }, 1500);
     } catch (error) {
       console.error('Submission error:', error);
       toast({
@@ -409,7 +403,7 @@ export default function ProviderRegistrationPage() {
                   disabled={isSubmitting}
                   className="w-full bg-primary text-primary-foreground hover:bg-primary/90 py-3"
                 >
-                  {isSubmitting ? 'Submitting Application...' : 'Submit Application'}
+                  {isSubmitting ? 'Creating Your Account...' : 'Create Account & Access Dashboard'}
                 </Button>
               </form>
             </CardContent>
