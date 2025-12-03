@@ -51,13 +51,6 @@ export default function ProviderDashboardPage() {
       const currentProvider = providers.find(p => p.email === member?.loginEmail);
       
       if (currentProvider) {
-        // Check if provider is approved
-        if (currentProvider.approvalStatus !== 'Approved') {
-          setProvider(null);
-          setLoading(false);
-          return;
-        }
-
         setProvider(currentProvider);
         
         // Load bookings for this provider
@@ -158,7 +151,7 @@ export default function ProviderDashboardPage() {
                 Provider Dashboard
               </h1>
               <p className="font-paragraph text-darktext/70 mb-6">
-                You haven't registered as a provider yet, or your application is pending approval.
+                You haven't registered as a provider yet.
               </p>
               <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90">
                 <a href="/provider-registration">Register as Provider</a>

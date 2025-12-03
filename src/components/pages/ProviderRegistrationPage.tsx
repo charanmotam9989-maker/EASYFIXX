@@ -10,9 +10,6 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { UserPlus, Shield, Star, DollarSign } from 'lucide-react';
 
-// Admin email address for notifications
-const ADMIN_EMAIL = 'admin@easyfix.com';
-
 export default function ProviderRegistrationPage() {
   const { toast } = useToast();
   const [formData, setFormData] = useState({
@@ -55,49 +52,7 @@ export default function ProviderRegistrationPage() {
     }));
   };
 
-  const sendAdminNotificationEmail = async (provider: ServiceProviders) => {
-    try {
-      const emailContent = `
-        <h2>New Provider Registration Application</h2>
-        <p>A new service provider has submitted their application for review.</p>
-        
-        <h3>Provider Information:</h3>
-        <ul>
-          <li><strong>Name:</strong> ${provider.providerName}</li>
-          <li><strong>Email:</strong> ${provider.email}</li>
-          <li><strong>Phone:</strong> ${provider.phoneNumber}</li>
-          <li><strong>Years of Experience:</strong> ${provider.yearsOfExperience}</li>
-          <li><strong>Services Offered:</strong> ${provider.servicesOffered}</li>
-          <li><strong>Bio:</strong> ${provider.bio}</li>
-          <li><strong>Profile Picture:</strong> ${provider.profilePicture || 'Not provided'}</li>
-          <li><strong>Application Date:</strong> ${new Date().toLocaleString()}</li>
-        </ul>
-        
-        <p>Please review this application and contact the provider to proceed with the verification process.</p>
-      `;
-
-      // Send email using fetch to a backend endpoint
-      const response = await fetch('/api/send-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          to: ADMIN_EMAIL,
-          subject: `New Provider Registration: ${provider.providerName}`,
-          html: emailContent,
-          replyTo: provider.email,
-        }),
-      });
-
-      if (!response.ok) {
-        console.error('Failed to send email notification');
-      }
-    } catch (error) {
-      console.error('Error sending email notification:', error);
-      // Don't throw error - email notification failure shouldn't block registration
-    }
-  };
+  // ... keep existing code (removed sendAdminNotificationEmail - no longer needed)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -179,18 +134,13 @@ export default function ProviderRegistrationPage() {
         profilePicture: formData.profilePicture.trim() || undefined,
         servicesOffered: formData.servicesOffered.join(','),
         isAvailable: true,
-        memberId: crypto.randomUUID(),
-        approvalStatus: 'Pending'
       } as ServiceProviders;
 
       await BaseCrudService.create('serviceproviders', newProvider);
       
-      // Send admin notification email
-      await sendAdminNotificationEmail(newProvider);
-      
       toast({
         title: "Registration Successful!",
-        description: "Your application has been submitted. We'll review it and contact you within 2-3 business days.",
+        description: "Welcome to EASYFIX! You can now access your provider dashboard and start accepting bookings.",
       });
       
       // Reset form
@@ -471,9 +421,9 @@ export default function ProviderRegistrationPage() {
       <section className="py-12 bg-secondary">
         <div className="max-w-[100rem] mx-auto px-6">
           <div className="text-center mb-8">
-            <h2 className="font-heading text-2xl text-darktext mb-4">What Happens Next?</h2>
+            <h2 className="font-heading text-2xl text-darktext mb-4">Get Started Immediately</h2>
             <p className="font-paragraph text-darktext/80 max-w-2xl mx-auto">
-              After you submit your application, here's what you can expect from our verification process.
+              After you submit your registration, you'll have instant access to your provider dashboard.
             </p>
           </div>
 
@@ -482,9 +432,9 @@ export default function ProviderRegistrationPage() {
               <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center mx-auto">
                 <span className="font-heading text-lg font-bold text-primary-foreground">1</span>
               </div>
-              <h3 className="font-heading text-lg text-darktext">Application Review</h3>
+              <h3 className="font-heading text-lg text-darktext">Complete Registration</h3>
               <p className="font-paragraph text-sm text-darktext/70">
-                We'll review your application within 1-2 business days and contact you with next steps.
+                Fill out your professional details and submit your registration form.
               </p>
             </div>
 
@@ -492,9 +442,9 @@ export default function ProviderRegistrationPage() {
               <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center mx-auto">
                 <span className="font-heading text-lg font-bold text-primary-foreground">2</span>
               </div>
-              <h3 className="font-heading text-lg text-darktext">Background Check</h3>
+              <h3 className="font-heading text-lg text-darktext">Access Your Dashboard</h3>
               <p className="font-paragraph text-sm text-darktext/70">
-                We'll conduct a thorough background check and verify your credentials and experience.
+                Log in immediately and access your provider dashboard to manage bookings.
               </p>
             </div>
 
@@ -502,9 +452,9 @@ export default function ProviderRegistrationPage() {
               <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center mx-auto">
                 <span className="font-heading text-lg font-bold text-primary-foreground">3</span>
               </div>
-              <h3 className="font-heading text-lg text-darktext">Welcome Aboard</h3>
+              <h3 className="font-heading text-lg text-darktext">Start Accepting Jobs</h3>
               <p className="font-paragraph text-sm text-darktext/70">
-                Once approved, you'll receive access to our provider portal and can start accepting jobs.
+                Begin receiving and accepting service requests from customers right away.
               </p>
             </div>
           </div>
