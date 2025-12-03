@@ -22,7 +22,6 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { format } from 'date-fns';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function ProviderDashboardPage() {
   const { member } = useMember();
@@ -31,6 +30,7 @@ export default function ProviderDashboardPage() {
   const [provider, setProvider] = useState<ServiceProviders | null>(null);
   const [bookings, setBookings] = useState<ServiceBookings[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filterStatus, setFilterStatus] = useState<string>('all');
   const [stats, setStats] = useState({
     totalBookings: 0,
     pendingBookings: 0,
@@ -265,212 +265,260 @@ export default function ProviderDashboardPage() {
       {/* Main Content */}
       <section className="py-12">
         <div className="max-w-[100rem] mx-auto px-6">
-          <Tabs defaultValue="bookings" className="w-full">
-            <TabsList className="grid w-full max-w-md grid-cols-2 mb-8">
-              <TabsTrigger value="bookings">Bookings</TabsTrigger>
-              <TabsTrigger value="profile">Profile Info</TabsTrigger>
-            </TabsList>
-
-            {/* Bookings Tab */}
-            <TabsContent value="bookings" className="space-y-6">
+          <div className="space-y-8">
+            {/* Bookings Header with Filter */}
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
-                <h2 className="font-heading text-2xl text-darktext mb-6">Your Bookings</h2>
-                
-                {bookings.length === 0 ? (
-                  <Card className="border-contentblockbackground">
-                    <CardContent className="py-12 text-center">
-                      <Calendar className="w-12 h-12 text-darktext/30 mx-auto mb-4" />
-                      <p className="font-paragraph text-darktext/70">
-                        No bookings yet. Check back soon!
-                      </p>
-                    </CardContent>
-                  </Card>
-                ) : (
-                  <div className="space-y-4">
-                    {bookings.map((booking) => (
-                      <Card key={booking._id} className="border-contentblockbackground hover:shadow-md transition-shadow">
-                        <CardContent className="pt-6">
-                          <div className="grid md:grid-cols-2 gap-6">
-                            {/* Booking Details */}
-                            <div className="space-y-4">
-                              <div>
-                                <p className="font-paragraph text-xs text-darktext/60 uppercase tracking-wide">Service</p>
-                                <p className="font-heading text-lg text-darktext">{booking.serviceName}</p>
-                              </div>
-                              
-                              <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                  <p className="font-paragraph text-xs text-darktext/60 uppercase tracking-wide">Date</p>
-                                  <p className="font-paragraph text-darktext">
-                                    {booking.bookingDate ? format(new Date(booking.bookingDate), 'MMM d, yyyy') : 'N/A'}
-                                  </p>
-                                </div>
-                                <div>
-                                  <p className="font-paragraph text-xs text-darktext/60 uppercase tracking-wide">Time</p>
-                                  <p className="font-paragraph text-darktext">{booking.bookingTime || 'N/A'}</p>
-                                </div>
-                              </div>
+                <h2 className="font-heading text-3xl text-darktext mb-2">Your Bookings</h2>
+                <p className="font-paragraph text-darktext/70">Manage and track all your service bookings</p>
+              </div>
+              
+              {/* Status Filter */}
+              <div className="flex gap-2 flex-wrap">
+                <Button
+                  variant={filterStatus === 'all' ? 'default' : 'outline'}
+                  onClick={() => setFilterStatus('all')}
+                  className={filterStatus === 'all' ? 'bg-primary text-primary-foreground' : ''}
+                >
+                  All
+                </Button>
+                <Button
+                  variant={filterStatus === 'Pending' ? 'default' : 'outline'}
+                  onClick={() => setFilterStatus('Pending')}
+                  className={filterStatus === 'Pending' ? 'bg-yellow-600 text-white' : ''}
+                >
+                  Pending
+                </Button>
+                <Button
+                  variant={filterStatus === 'Confirmed' ? 'default' : 'outline'}
+                  onClick={() => setFilterStatus('Confirmed')}
+                  className={filterStatus === 'Confirmed' ? 'bg-blue-600 text-white' : ''}
+                >
+                  Confirmed
+                </Button>
+                <Button
+                  variant={filterStatus === 'Completed' ? 'default' : 'outline'}
+                  onClick={() => setFilterStatus('Completed')}
+                  className={filterStatus === 'Completed' ? 'bg-green-600 text-white' : ''}
+                >
+                  Completed
+                </Button>
+              </div>
+            </div>
 
+            {/* Bookings List */}
+            {bookings.length === 0 ? (
+              <Card className="border-contentblockbackground">
+                <CardContent className="py-16 text-center">
+                  <Calendar className="w-16 h-16 text-darktext/20 mx-auto mb-4" />
+                  <h3 className="font-heading text-xl text-darktext mb-2">No bookings yet</h3>
+                  <p className="font-paragraph text-darktext/70">
+                    Your bookings will appear here once customers start booking your services.
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-4">
+                {bookings
+                  .filter(booking => filterStatus === 'all' || booking.bookingStatus === filterStatus)
+                  .map((booking) => (
+                    <Card key={booking._id} className="border-contentblockbackground hover:shadow-lg transition-all duration-200">
+                      <CardContent className="pt-6">
+                        <div className="grid md:grid-cols-3 gap-6">
+                          {/* Left: Service & Date Info */}
+                          <div className="space-y-4">
+                            <div>
+                              <p className="font-paragraph text-xs text-darktext/60 uppercase tracking-wide mb-1">Service</p>
+                              <p className="font-heading text-lg text-darktext font-semibold">{booking.serviceName}</p>
+                            </div>
+                            
+                            <div className="grid grid-cols-2 gap-4">
                               <div>
-                                <p className="font-paragraph text-xs text-darktext/60 uppercase tracking-wide">Address</p>
-                                <div className="flex items-start space-x-2">
-                                  <MapPin className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                                  <p className="font-paragraph text-darktext text-sm">{booking.serviceAddress}</p>
-                                </div>
+                                <p className="font-paragraph text-xs text-darktext/60 uppercase tracking-wide mb-1">Date</p>
+                                <p className="font-paragraph text-darktext font-medium">
+                                  {booking.bookingDate ? format(new Date(booking.bookingDate), 'MMM d') : 'N/A'}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="font-paragraph text-xs text-darktext/60 uppercase tracking-wide mb-1">Time</p>
+                                <p className="font-paragraph text-darktext font-medium">{booking.bookingTime || 'N/A'}</p>
                               </div>
                             </div>
 
-                            {/* Customer & Status */}
-                            <div className="space-y-4">
-                              <div>
-                                <p className="font-paragraph text-xs text-darktext/60 uppercase tracking-wide mb-2">Customer</p>
-                                <div className="space-y-2">
-                                  <div className="flex items-center space-x-2">
-                                    <Users className="w-4 h-4 text-primary" />
-                                    <p className="font-paragraph text-darktext">{booking.customerName}</p>
-                                  </div>
-                                  <div className="flex items-center space-x-2">
-                                    <Mail className="w-4 h-4 text-primary" />
-                                    <p className="font-paragraph text-darktext text-sm">{booking.customerEmail}</p>
-                                  </div>
-                                  {booking.providerPhoneNumber && (
-                                    <div className="flex items-center space-x-2">
-                                      <Phone className="w-4 h-4 text-primary" />
-                                      <p className="font-paragraph text-darktext text-sm">{booking.providerPhoneNumber}</p>
-                                    </div>
-                                  )}
-                                </div>
+                            <div>
+                              <p className="font-paragraph text-xs text-darktext/60 uppercase tracking-wide mb-2">Location</p>
+                              <div className="flex items-start space-x-2">
+                                <MapPin className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                                <p className="font-paragraph text-darktext text-sm">{booking.serviceAddress}</p>
                               </div>
+                            </div>
+                          </div>
 
-                              <div>
-                                <p className="font-paragraph text-xs text-darktext/60 uppercase tracking-wide mb-2">Status</p>
-                                <div className="flex items-center space-x-2 mb-3">
-                                  <Badge className={`${getStatusColor(booking.bookingStatus || 'Pending')} border-0 flex items-center space-x-1`}>
-                                    {getStatusIcon(booking.bookingStatus || 'Pending')}
-                                    <span>{booking.bookingStatus || 'Pending'}</span>
-                                  </Badge>
+                          {/* Middle: Customer Details */}
+                          <div className="space-y-4 md:border-l md:border-r md:border-contentblockbackground md:px-6">
+                            <div>
+                              <p className="font-paragraph text-xs text-darktext/60 uppercase tracking-wide mb-3">Customer Details</p>
+                              <div className="space-y-3">
+                                <div>
+                                  <p className="font-paragraph text-xs text-darktext/50 mb-1">Name</p>
+                                  <p className="font-paragraph text-darktext font-medium">{booking.customerName}</p>
                                 </div>
-                                
-                                {booking.bookingStatus === 'Pending' && (
-                                  <div className="flex gap-2">
-                                    <Button
-                                      size="sm"
-                                      onClick={() => handleBookingStatusChange(booking._id, 'Confirmed')}
-                                      className="bg-primary text-primary-foreground hover:bg-primary/90"
-                                    >
-                                      Accept
-                                    </Button>
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      onClick={() => handleBookingStatusChange(booking._id, 'Cancelled')}
-                                      className="border-red-300 text-red-600 hover:bg-red-50"
-                                    >
-                                      Decline
-                                    </Button>
+                                <div>
+                                  <p className="font-paragraph text-xs text-darktext/50 mb-1">Email</p>
+                                  <a href={`mailto:${booking.customerEmail}`} className="font-paragraph text-primary hover:underline text-sm">
+                                    {booking.customerEmail}
+                                  </a>
+                                </div>
+                                {booking.providerPhoneNumber && (
+                                  <div>
+                                    <p className="font-paragraph text-xs text-darktext/50 mb-1">Phone</p>
+                                    <a href={`tel:${booking.providerPhoneNumber}`} className="font-paragraph text-primary hover:underline text-sm">
+                                      {booking.providerPhoneNumber}
+                                    </a>
                                   </div>
                                 )}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Right: Status & Actions */}
+                          <div className="space-y-4 flex flex-col justify-between">
+                            <div>
+                              <p className="font-paragraph text-xs text-darktext/60 uppercase tracking-wide mb-3">Status & Price</p>
+                              <div className="space-y-3">
+                                <Badge className={`${getStatusColor(booking.bookingStatus || 'Pending')} border-0 flex items-center space-x-1 w-fit`}>
+                                  {getStatusIcon(booking.bookingStatus || 'Pending')}
+                                  <span>{booking.bookingStatus || 'Pending'}</span>
+                                </Badge>
                                 
-                                {booking.bookingStatus === 'Confirmed' && (
+                                {booking.totalPrice && (
+                                  <div>
+                                    <p className="font-paragraph text-xs text-darktext/60 mb-1">Total Price</p>
+                                    <p className="font-heading text-2xl text-primary font-bold">₹{booking.totalPrice}</p>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="flex gap-2 flex-col">
+                              {booking.bookingStatus === 'Pending' && (
+                                <>
                                   <Button
-                                    size="sm"
-                                    onClick={() => handleBookingStatusChange(booking._id, 'Completed')}
-                                    className="bg-green-600 text-white hover:bg-green-700"
+                                    onClick={() => handleBookingStatusChange(booking._id, 'Confirmed')}
+                                    className="bg-primary text-primary-foreground hover:bg-primary/90 w-full"
                                   >
-                                    Mark Complete
+                                    <CheckCircle className="w-4 h-4 mr-2" />
+                                    Accept Booking
                                   </Button>
-                                )}
-                              </div>
+                                  <Button
+                                    variant="outline"
+                                    onClick={() => handleBookingStatusChange(booking._id, 'Cancelled')}
+                                    className="border-red-300 text-red-600 hover:bg-red-50 w-full"
+                                  >
+                                    Decline
+                                  </Button>
+                                </>
+                              )}
+                              
+                              {booking.bookingStatus === 'Confirmed' && (
+                                <Button
+                                  onClick={() => handleBookingStatusChange(booking._id, 'Completed')}
+                                  className="bg-green-600 text-white hover:bg-green-700 w-full"
+                                >
+                                  <CheckCircle className="w-4 h-4 mr-2" />
+                                  Mark Complete
+                                </Button>
+                              )}
 
-                              {booking.totalPrice && (
-                                <div className="pt-2 border-t border-contentblockbackground">
-                                  <p className="font-paragraph text-xs text-darktext/60 uppercase tracking-wide mb-1">Price</p>
-                                  <p className="font-heading text-xl text-primary font-bold">
-                                    ₹{booking.totalPrice}
-                                  </p>
+                              {booking.bookingStatus === 'Completed' && (
+                                <div className="text-center py-2">
+                                  <p className="font-paragraph text-sm text-green-600 font-medium">✓ Completed</p>
                                 </div>
                               )}
                             </div>
                           </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Profile Section */}
+      <section className="py-12 bg-secondary">
+        <div className="max-w-[100rem] mx-auto px-6">
+          <h2 className="font-heading text-2xl text-darktext mb-8">Your Profile</h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Contact Information */}
+            <Card className="border-contentblockbackground">
+              <CardHeader>
+                <CardTitle className="font-heading text-lg text-darktext">Contact Information</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <p className="font-paragraph text-xs text-darktext/60 uppercase tracking-wide mb-1">Email</p>
+                  <div className="flex items-center space-x-2">
+                    <Mail className="w-4 h-4 text-primary" />
+                    <p className="font-paragraph text-darktext">{provider.email}</p>
                   </div>
-                )}
-              </div>
-            </TabsContent>
+                </div>
+                
+                <div>
+                  <p className="font-paragraph text-xs text-darktext/60 uppercase tracking-wide mb-1">Phone</p>
+                  <div className="flex items-center space-x-2">
+                    <Phone className="w-4 h-4 text-primary" />
+                    <p className="font-paragraph text-darktext">{provider.phoneNumber}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-            {/* Profile Tab */}
-            <TabsContent value="profile" className="space-y-6">
-              <div className="grid md:grid-cols-2 gap-6">
-                {/* Contact Information */}
-                <Card className="border-contentblockbackground">
-                  <CardHeader>
-                    <CardTitle className="font-heading text-xl text-darktext">Contact Information</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <p className="font-paragraph text-xs text-darktext/60 uppercase tracking-wide mb-1">Email</p>
-                      <div className="flex items-center space-x-2">
-                        <Mail className="w-4 h-4 text-primary" />
-                        <p className="font-paragraph text-darktext">{provider.email}</p>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <p className="font-paragraph text-xs text-darktext/60 uppercase tracking-wide mb-1">Phone</p>
-                      <div className="flex items-center space-x-2">
-                        <Phone className="w-4 h-4 text-primary" />
-                        <p className="font-paragraph text-darktext">{provider.phoneNumber}</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+            {/* Services Information */}
+            <Card className="border-contentblockbackground">
+              <CardHeader>
+                <CardTitle className="font-heading text-lg text-darktext">Services Offered</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-2">
+                  {provider.servicesOffered?.split(',').map((service, index) => (
+                    <Badge key={index} className="bg-primary/10 text-primary border-primary/20">
+                      {service.trim()}
+                    </Badge>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
 
-                {/* Services Information */}
-                <Card className="border-contentblockbackground">
-                  <CardHeader>
-                    <CardTitle className="font-heading text-xl text-darktext">Services Offered</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex flex-wrap gap-2">
-                      {provider.servicesOffered?.split(',').map((service, index) => (
-                        <Badge key={index} className="bg-primary/10 text-primary border-primary/20">
-                          {service.trim()}
-                        </Badge>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Professional Information */}
-                <Card className="border-contentblockbackground md:col-span-2">
-                  <CardHeader>
-                    <CardTitle className="font-heading text-xl text-darktext">Professional Information</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <p className="font-paragraph text-xs text-darktext/60 uppercase tracking-wide mb-2">Bio</p>
-                      <p className="font-paragraph text-darktext">{provider.bio}</p>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-4 pt-4 border-t border-contentblockbackground">
-                      <div>
-                        <p className="font-paragraph text-xs text-darktext/60 uppercase tracking-wide mb-1">Years of Experience</p>
-                        <p className="font-heading text-2xl text-primary font-bold">{provider.yearsOfExperience}</p>
-                      </div>
-                      <div>
-                        <p className="font-paragraph text-xs text-darktext/60 uppercase tracking-wide mb-1">Availability</p>
-                        <Badge className={provider.isAvailable ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
-                          {provider.isAvailable ? 'Available' : 'Not Available'}
-                        </Badge>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-          </Tabs>
+            {/* Professional Information */}
+            <Card className="border-contentblockbackground md:col-span-2">
+              <CardHeader>
+                <CardTitle className="font-heading text-lg text-darktext">Professional Information</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <p className="font-paragraph text-xs text-darktext/60 uppercase tracking-wide mb-2">Bio</p>
+                  <p className="font-paragraph text-darktext">{provider.bio}</p>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-contentblockbackground">
+                  <div>
+                    <p className="font-paragraph text-xs text-darktext/60 uppercase tracking-wide mb-1">Years of Experience</p>
+                    <p className="font-heading text-2xl text-primary font-bold">{provider.yearsOfExperience}</p>
+                  </div>
+                  <div>
+                    <p className="font-paragraph text-xs text-darktext/60 uppercase tracking-wide mb-1">Availability</p>
+                    <Badge className={provider.isAvailable ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
+                      {provider.isAvailable ? 'Available' : 'Not Available'}
+                    </Badge>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </section>
     </div>
