@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import { Clock, User } from 'lucide-react';
+import { Clock, User, Map } from 'lucide-react';
 import { format } from 'date-fns';
 
 export default function BookingsPage() {
@@ -47,6 +47,12 @@ export default function BookingsPage() {
       default:
         return 'bg-gray-100 text-gray-800';
     }
+  };
+
+  const openAddressOnGoogleMaps = (address: string) => {
+    const encodedAddress = encodeURIComponent(address);
+    const mapsUrl = `https://www.google.com/maps/search/${encodedAddress}`;
+    window.open(mapsUrl, '_blank');
   };
 
   if (loading) {
@@ -134,6 +140,17 @@ export default function BookingsPage() {
                       <Button asChild size="sm" variant="outline" className="border-buttonborder text-darktext">
                         <Link to={`/services/${booking._id}`}>View Details</Link>
                       </Button>
+                      {booking.serviceAddress && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => openAddressOnGoogleMaps(booking.serviceAddress!)}
+                          className="border-buttonborder text-darktext hover:bg-contentblockbackground"
+                        >
+                          <Map className="w-4 h-4 mr-2" />
+                          View on Map
+                        </Button>
+                      )}
                       <Button asChild size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
                         <Link to="/contact">Contact Support</Link>
                       </Button>

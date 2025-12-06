@@ -13,7 +13,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useToast } from '@/hooks/use-toast';
-import { CalendarIcon, Clock, MapPin, User, ArrowLeft } from 'lucide-react';
+import { CalendarIcon, Clock, MapPin, User, ArrowLeft, Map } from 'lucide-react';
 import { format } from 'date-fns';
 import { Image } from '@/components/ui/image';
 
@@ -211,6 +211,17 @@ export default function BookingPage() {
       toast({
         title: "Booking Confirmed!",
         description: "Your service has been booked successfully. You'll receive a confirmation email shortly.",
+        action: (
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => openAddressOnGoogleMaps(bookingData.serviceAddress)}
+            className="border-buttonborder text-darktext hover:bg-contentblockbackground"
+          >
+            <Map className="w-4 h-4 mr-2" />
+            View on Map
+          </Button>
+        ),
       });
       
       navigate('/bookings');
@@ -230,6 +241,12 @@ export default function BookingPage() {
     '12:00 PM', '1:00 PM', '2:00 PM', '3:00 PM',
     '4:00 PM', '5:00 PM', '6:00 PM'
   ];
+
+  const openAddressOnGoogleMaps = (address: string) => {
+    const encodedAddress = encodeURIComponent(address);
+    const mapsUrl = `https://www.google.com/maps/search/${encodedAddress}`;
+    window.open(mapsUrl, '_blank');
+  };
 
   if (loading) {
     return (

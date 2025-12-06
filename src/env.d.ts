@@ -5,3 +5,12 @@ declare global {
     strict: true;
   }
 }
+
+interface ImportMetaEnv {
+  readonly BASE_NAME?: string;
+  readonly SENDGRID_API_KEY?: string;
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}

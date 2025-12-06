@@ -79,6 +79,12 @@ export interface ServiceProviders {
   yearsOfExperience?: number;
   /** @wixFieldType boolean */
   isAvailable?: boolean;
+  /** @wixFieldType text */
+  approvalStatus?: string;
+  /** @wixFieldType datetime */
+  approvalDate?: Date | string;
+  /** @wixFieldType text */
+  rejectionReason?: string;
 }
 
 
