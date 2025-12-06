@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useMember } from '@/integrations';
 import { BaseCrudService } from '@/integrations';
 import { ServiceProviders, Services } from '@/entities';
 import { Button } from '@/components/ui/button';
@@ -14,9 +15,10 @@ import { UserPlus, Shield, Star, DollarSign } from 'lucide-react';
 export default function ProviderRegistrationPage() {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { member } = useMember();
   const [formData, setFormData] = useState({
     providerName: '',
-    email: '',
+    email: member?.loginEmail || '',
     phoneNumber: '',
     bio: '',
     yearsOfExperience: '',
@@ -30,7 +32,11 @@ export default function ProviderRegistrationPage() {
 
   useEffect(() => {
     loadServices();
-  }, []);
+    // Update email when member data loads
+    if (member?.loginEmail) {
+      setFormData(prev => ({ ...prev, email: member.loginEmail }));
+    }
+  }, [member?.loginEmail]);
 
   const loadServices = async () => {
     try {
@@ -129,7 +135,7 @@ export default function ProviderRegistrationPage() {
       const newProvider = {
         _id: crypto.randomUUID(),
         providerName: formData.providerName.trim(),
-        email: formData.email.trim(),
+        email: member?.loginEmail || formData.email.trim(),
         phoneNumber: formData.phoneNumber.trim(),
         bio: formData.bio.trim(),
         yearsOfExperience: parseInt(formData.yearsOfExperience) || 0,

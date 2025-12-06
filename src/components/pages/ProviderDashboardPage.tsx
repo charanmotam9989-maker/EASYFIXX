@@ -48,7 +48,7 @@ export default function ProviderDashboardPage() {
       
       // Get all providers and find the one matching current user's email
       const { items: providers } = await BaseCrudService.getAll<ServiceProviders>('serviceproviders');
-      const currentProvider = providers.find(p => p.email === member?.loginEmail);
+      const currentProvider = providers.find(p => p.email?.toLowerCase() === member?.loginEmail?.toLowerCase());
       
       if (currentProvider) {
         setProvider(currentProvider);
