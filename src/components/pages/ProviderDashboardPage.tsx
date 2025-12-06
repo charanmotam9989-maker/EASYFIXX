@@ -81,12 +81,18 @@ export default function ProviderDashboardPage() {
     }
   };
 
-  const handleBookingStatusChange = async (bookingId: string, newStatus: string) => {
+  const handleBookingStatusChange = async (bookingId: string, newStatus: string, booking?: ServiceBookings) => {
     try {
       await BaseCrudService.update<ServiceBookings>('servicebookings', {
         _id: bookingId,
         bookingStatus: newStatus
       });
+      
+      // If confirming a booking, open Google Maps with the address
+      if (newStatus === 'Confirmed' && booking?.serviceAddress) {
+        const mapsUrl = `https://www.google.com/maps/search/${encodeURIComponent(booking.serviceAddress)}`;
+        window.open(mapsUrl, '_blank');
+      }
       
       // Reload bookings
       loadProviderData();
@@ -405,7 +411,7 @@ export default function ProviderDashboardPage() {
                               {booking.bookingStatus === 'Pending' && (
                                 <>
                                   <Button
-                                    onClick={() => handleBookingStatusChange(booking._id, 'Confirmed')}
+                                    onClick={() => handleBookingStatusChange(booking._id, 'Confirmed', booking)}
                                     className="bg-primary text-primary-foreground hover:bg-primary/90 w-full"
                                   >
                                     <CheckCircle className="w-4 h-4 mr-2" />
