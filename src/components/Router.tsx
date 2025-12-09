@@ -10,7 +10,7 @@ import HomePage from '@/components/pages/HomePage';
 import LoginPage from '@/components/pages/LoginPage';
 import TouristRegistrationPage from '@/components/pages/TouristRegistrationPage';
 import GuideRegistrationPage from '@/components/pages/GuideRegistrationPage';
-import ServicesPage from '@/components/pages/ServicesPage';
+import ExperiencesPage from '@/components/pages/ExperiencesPage';
 import ServiceDetailPage from '@/components/pages/ServiceDetailPage';
 import AboutPage from '@/components/pages/AboutPage';
 import ContactPage from '@/components/pages/ContactPage';
@@ -56,11 +56,11 @@ const router = createBrowserRouter([
       },
       {
         path: "services",
-        element: <ServicesPage />,
+        element: <ExperiencesPage />,
       },
       {
         path: "experiences",
-        element: <ServicesPage />, // Reusing ServicesPage for experiences
+        element: <ExperiencesPage />,
       },
       {
         path: "services/:id",

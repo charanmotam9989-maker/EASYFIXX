@@ -12,6 +12,10 @@ export interface CustomerReviews {
   _createdDate?: Date;
   _updatedDate?: Date;
   /** @wixFieldType text */
+  experienceReference?: string;
+  /** @wixFieldType text */
+  guideReference?: string;
+  /** @wixFieldType text */
   reviewContent?: string;
   /** @wixFieldType number */
   rating?: number;
@@ -21,10 +25,6 @@ export interface CustomerReviews {
   submissionDate?: Date | string;
   /** @wixFieldType boolean */
   isVerified?: boolean;
-  /** @wixFieldType text */
-  guideReference?: string;
-  /** @wixFieldType text */
-  experienceReference?: string;
 }
 
 
@@ -68,6 +68,10 @@ export interface ServiceProviders {
   _createdDate?: Date;
   _updatedDate?: Date;
   /** @wixFieldType text */
+  specialties?: string;
+  /** @wixFieldType number */
+  rating?: number;
+  /** @wixFieldType text */
   providerName?: string;
   /** @wixFieldType text */
   servicesOffered?: string;
@@ -83,10 +87,6 @@ export interface ServiceProviders {
   yearsOfExperience?: number;
   /** @wixFieldType boolean */
   isAvailable?: boolean;
-  /** @wixFieldType text */
-  specialties?: string;
-  /** @wixFieldType number */
-  rating?: number;
   /** @wixFieldType text */
   approvalStatus?: string;
   /** @wixFieldType datetime */
@@ -105,7 +105,15 @@ export interface Services {
   _createdDate?: Date;
   _updatedDate?: Date;
   /** @wixFieldType text */
+  duration?: string;
+  /** @wixFieldType text */
+  guideReference?: string;
+  /** @wixFieldType text */
+  difficultyLevel?: string;
+  /** @wixFieldType text */
   serviceName?: string;
+  /** @wixFieldType text */
+  destination?: string;
   /** @wixFieldType text */
   serviceType?: string;
   /** @wixFieldType text */
@@ -116,12 +124,4 @@ export interface Services {
   startingPrice?: number;
   /** @wixFieldType image */
   serviceImage?: string;
-  /** @wixFieldType text */
-  destination?: string;
-  /** @wixFieldType text */
-  duration?: string;
-  /** @wixFieldType text */
-  difficultyLevel?: string;
-  /** @wixFieldType text */
-  guideReference?: string;
 }
