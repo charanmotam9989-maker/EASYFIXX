@@ -21,6 +21,10 @@ export interface CustomerReviews {
   submissionDate?: Date | string;
   /** @wixFieldType boolean */
   isVerified?: boolean;
+  /** @wixFieldType text */
+  guideReference?: string;
+  /** @wixFieldType text */
+  experienceReference?: string;
 }
 
 
@@ -79,6 +83,16 @@ export interface ServiceProviders {
   yearsOfExperience?: number;
   /** @wixFieldType boolean */
   isAvailable?: boolean;
+  /** @wixFieldType text */
+  specialties?: string;
+  /** @wixFieldType number */
+  rating?: number;
+  /** @wixFieldType text */
+  approvalStatus?: string;
+  /** @wixFieldType datetime */
+  approvalDate?: Date | string;
+  /** @wixFieldType text */
+  rejectionReason?: string;
 }
 
 
@@ -102,4 +116,12 @@ export interface Services {
   startingPrice?: number;
   /** @wixFieldType image */
   serviceImage?: string;
+  /** @wixFieldType text */
+  destination?: string;
+  /** @wixFieldType text */
+  duration?: string;
+  /** @wixFieldType text */
+  difficultyLevel?: string;
+  /** @wixFieldType text */
+  guideReference?: string;
 }

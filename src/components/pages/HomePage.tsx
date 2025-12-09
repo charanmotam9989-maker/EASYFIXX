@@ -2,12 +2,12 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Wrench, Shield, Star, Clock, ArrowRight, CheckCircle2, Zap, Users } from 'lucide-react';
+import { MapPin, Shield, Star, Clock, ArrowRight, CheckCircle2, Zap, Users, Compass } from 'lucide-react';
 import { useMember } from '@/integrations';
 import { Image } from '@/components/ui/image';
 
 export default function HomePage() {
-  const { isAuthenticated, actions } = useMember();
+  const { isAuthenticated, actions, member } = useMember();
 
   return (
     <div className="min-h-screen bg-background">
@@ -17,20 +17,20 @@ export default function HomePage() {
           {/* Left Content */}
           <div className="flex flex-col justify-center px-8 lg:px-16 py-20 lg:py-32 bg-gradient-to-br from-primary/5 via-background to-secondary/30">
             <Badge className="w-fit mb-6 bg-primary/10 text-primary border-primary/20 hover:bg-primary/20">
-              Trusted by 10,000+ Homeowners
+              Discover Amazing Travel Experiences
             </Badge>
             <h1 className="font-heading text-5xl lg:text-7xl text-darktext mb-6 leading-tight">
-              Your Home
-              <span className="block text-primary mt-2">Deserves Expert Care</span>
+              Explore the World
+              <span className="block text-primary mt-2">With Expert Guides</span>
             </h1>
             <p className="font-paragraph text-xl text-darktext/70 mb-10 max-w-xl">
-              Connect with verified professionals for all your repair and maintenance needs. 
-              Quality service, guaranteed satisfaction, every time.
+              Connect with passionate local guides and discover unique travel experiences. 
+              Authentic adventures, verified guides, unforgettable memories.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 h-14 px-8 text-lg">
-                <Link to="/services">
-                  Browse Services
+                <Link to="/experiences">
+                  Browse Experiences
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
@@ -38,10 +38,12 @@ export default function HomePage() {
                 <Button 
                   variant="outline" 
                   size="lg"
-                  onClick={actions.login}
+                  asChild
                   className="border-2 border-buttonborder text-darktext hover:bg-secondary h-14 px-8 text-lg"
                 >
-                  Sign In
+                  <Link to="/login">
+                    Sign In
+                  </Link>
                 </Button>
               )}
             </div>
@@ -49,16 +51,16 @@ export default function HomePage() {
             {/* Stats */}
             <div className="grid grid-cols-3 gap-6 mt-16 pt-10 border-t border-darktext/10">
               <div>
-                <div className="font-heading text-3xl text-primary mb-1">500+</div>
-                <div className="font-paragraph text-sm text-darktext/60">Verified Pros</div>
+                <div className="font-heading text-3xl text-primary mb-1">1000+</div>
+                <div className="font-paragraph text-sm text-darktext/60">Expert Guides</div>
               </div>
               <div>
                 <div className="font-heading text-3xl text-primary mb-1">4.9★</div>
                 <div className="font-paragraph text-sm text-darktext/60">Avg Rating</div>
               </div>
               <div>
-                <div className="font-heading text-3xl text-primary mb-1">24/7</div>
-                <div className="font-paragraph text-sm text-darktext/60">Support</div>
+                <div className="font-heading text-3xl text-primary mb-1">50+</div>
+                <div className="font-paragraph text-sm text-darktext/60">Destinations</div>
               </div>
             </div>
           </div>
@@ -68,7 +70,7 @@ export default function HomePage() {
             <div className="relative w-full h-full flex items-center justify-center">
               <Image 
                 src="https://static.wixstatic.com/media/127917_94e286ce3b9f4eef97357be2d0fb2300~mv2.png?originWidth=768&originHeight=576"
-                alt="Professional home service expert at work"
+                alt="Expert travel guide leading a group of tourists"
                 className="w-full h-full object-cover rounded-2xl"
                 width={800}
               />
@@ -76,11 +78,11 @@ export default function HomePage() {
               <div className="absolute bottom-8 left-8 right-8 bg-background p-6 rounded-xl shadow-2xl border border-primary/10">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
-                    <CheckCircle2 className="w-6 h-6 text-primary-foreground" />
+                    <Compass className="w-6 h-6 text-primary-foreground" />
                   </div>
                   <div>
                     <div className="font-heading text-lg text-darktext">Instant Booking</div>
-                    <div className="font-paragraph text-sm text-darktext/60">Get confirmed in minutes</div>
+                    <div className="font-paragraph text-sm text-darktext/60">Reserve your adventure in minutes</div>
                   </div>
                 </div>
               </div>
@@ -95,10 +97,10 @@ export default function HomePage() {
           <div className="grid lg:grid-cols-12 gap-12 items-center mb-16">
             <div className="lg:col-span-5">
               <h2 className="font-heading text-4xl lg:text-5xl text-darktext mb-6">
-                Why Thousands Choose EASYFIX
+                Why Choose Guidaroo
               </h2>
               <p className="font-paragraph text-lg text-darktext/70">
-                We've revolutionized home services by combining technology with trusted professionals
+                We connect travelers with passionate local guides for authentic, unforgettable experiences
               </p>
             </div>
             <div className="lg:col-span-7">
@@ -107,9 +109,9 @@ export default function HomePage() {
                   <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mb-5">
                     <Shield className="w-7 h-7 text-primary" />
                   </div>
-                  <h3 className="font-heading text-xl text-darktext mb-3">Verified Professionals</h3>
+                  <h3 className="font-heading text-xl text-darktext mb-3">Verified Guides</h3>
                   <p className="font-paragraph text-base text-darktext/70">
-                    Background-checked experts with proven track records
+                    All guides are background-checked with proven expertise
                   </p>
                 </Card>
 
@@ -117,9 +119,9 @@ export default function HomePage() {
                   <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mb-5">
                     <Star className="w-7 h-7 text-primary" />
                   </div>
-                  <h3 className="font-heading text-xl text-darktext mb-3">Quality Guaranteed</h3>
+                  <h3 className="font-heading text-xl text-darktext mb-3">Quality Experiences</h3>
                   <p className="font-paragraph text-base text-darktext/70">
-                    100% satisfaction guarantee on every service
+                    Curated travel experiences with authentic local insights
                   </p>
                 </Card>
 
@@ -127,19 +129,19 @@ export default function HomePage() {
                   <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mb-5">
                     <Zap className="w-7 h-7 text-primary" />
                   </div>
-                  <h3 className="font-heading text-xl text-darktext mb-3">Lightning Fast</h3>
+                  <h3 className="font-heading text-xl text-darktext mb-3">Easy Booking</h3>
                   <p className="font-paragraph text-base text-darktext/70">
-                    Book in 60 seconds, get service same-day
+                    Book your adventure in seconds with instant confirmation
                   </p>
                 </Card>
 
                 <Card className="border-2 border-primary/10 hover:border-primary/30 transition-all hover:shadow-lg p-6">
                   <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mb-5">
-                    <Wrench className="w-7 h-7 text-primary" />
+                    <MapPin className="w-7 h-7 text-primary" />
                   </div>
-                  <h3 className="font-heading text-xl text-darktext mb-3">All Services</h3>
+                  <h3 className="font-heading text-xl text-darktext mb-3">Global Reach</h3>
                   <p className="font-paragraph text-base text-darktext/70">
-                    From plumbing to electrical - we've got you covered
+                    Explore 50+ destinations with expert local guides
                   </p>
                 </Card>
               </div>
@@ -154,10 +156,10 @@ export default function HomePage() {
           <div className="text-center mb-16">
             <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">Simple Process</Badge>
             <h2 className="font-heading text-4xl lg:text-5xl text-darktext mb-6">
-              Book a Service in 3 Easy Steps
+              Book Your Adventure in 3 Steps
             </h2>
             <p className="font-paragraph text-lg text-darktext/70 max-w-2xl mx-auto">
-              Our streamlined process gets you from browsing to booking in minutes
+              From discovery to adventure - get started in minutes
             </p>
           </div>
 
@@ -170,18 +172,18 @@ export default function HomePage() {
                 <div className="w-20 h-20 bg-primary text-primary-foreground rounded-2xl flex items-center justify-center mb-6 font-heading text-3xl shadow-lg">
                   1
                 </div>
-                <h3 className="font-heading text-2xl text-darktext mb-4">Choose Your Service</h3>
+                <h3 className="font-heading text-2xl text-darktext mb-4">Explore Experiences</h3>
                 <p className="font-paragraph text-base text-darktext/70 mb-6">
-                  Browse our comprehensive catalog of professional home services
+                  Browse our collection of unique travel experiences
                 </p>
                 <ul className="space-y-2">
                   <li className="flex items-center gap-2 font-paragraph text-sm text-darktext/70">
                     <CheckCircle2 className="w-4 h-4 text-primary" />
-                    Compare providers
+                    Filter by destination
                   </li>
                   <li className="flex items-center gap-2 font-paragraph text-sm text-darktext/70">
                     <CheckCircle2 className="w-4 h-4 text-primary" />
-                    Read reviews
+                    Read guide reviews
                   </li>
                 </ul>
               </div>
@@ -192,9 +194,9 @@ export default function HomePage() {
                 <div className="w-20 h-20 bg-primary text-primary-foreground rounded-2xl flex items-center justify-center mb-6 font-heading text-3xl shadow-lg">
                   2
                 </div>
-                <h3 className="font-heading text-2xl text-darktext mb-4">Book Instantly</h3>
+                <h3 className="font-heading text-2xl text-darktext mb-4">Book Your Spot</h3>
                 <p className="font-paragraph text-base text-darktext/70 mb-6">
-                  Select your preferred date, time, and get instant confirmation
+                  Choose your date and secure your booking instantly
                 </p>
                 <ul className="space-y-2">
                   <li className="flex items-center gap-2 font-paragraph text-sm text-darktext/70">
@@ -214,18 +216,18 @@ export default function HomePage() {
                 <div className="w-20 h-20 bg-primary text-primary-foreground rounded-2xl flex items-center justify-center mb-6 font-heading text-3xl shadow-lg">
                   3
                 </div>
-                <h3 className="font-heading text-2xl text-darktext mb-4">Relax & Enjoy</h3>
+                <h3 className="font-heading text-2xl text-darktext mb-4">Enjoy Your Adventure</h3>
                 <p className="font-paragraph text-base text-darktext/70 mb-6">
-                  Our verified professionals handle everything with expertise
+                  Experience authentic travel with your expert guide
                 </p>
                 <ul className="space-y-2">
                   <li className="flex items-center gap-2 font-paragraph text-sm text-darktext/70">
                     <CheckCircle2 className="w-4 h-4 text-primary" />
-                    Professional service
+                    Expert guidance
                   </li>
                   <li className="flex items-center gap-2 font-paragraph text-sm text-darktext/70">
                     <CheckCircle2 className="w-4 h-4 text-primary" />
-                    Quality guaranteed
+                    Unforgettable memories
                   </li>
                 </ul>
               </div>
@@ -241,10 +243,10 @@ export default function HomePage() {
             <div>
               <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">Testimonials</Badge>
               <h2 className="font-heading text-4xl lg:text-5xl text-darktext mb-6">
-                Loved by Homeowners Everywhere
+                Loved by Travelers Worldwide
               </h2>
               <p className="font-paragraph text-lg text-darktext/70 mb-8">
-                Join thousands of satisfied customers who trust EASYFIX for their home service needs
+                Join thousands of satisfied travelers who've discovered amazing experiences with Guidaroo
               </p>
               <Button asChild size="lg" variant="outline" className="border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground">
                 <Link to="/reviews">
@@ -262,15 +264,15 @@ export default function HomePage() {
                   ))}
                 </div>
                 <p className="font-paragraph text-base text-darktext/80 mb-4">
-                  "EASYFIX made finding a reliable plumber so easy! The booking process was seamless and the service was excellent."
+                  "Amazing experience! Our guide was so knowledgeable and made the entire trip unforgettable. Highly recommend Guidaroo!"
                 </p>
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
                     <Users className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <div className="font-heading text-sm text-darktext">Priya Sharma</div>
-                    <div className="font-paragraph text-xs text-darktext/60">Homeowner</div>
+                    <div className="font-heading text-sm text-darktext">Sarah Johnson</div>
+                    <div className="font-paragraph text-xs text-darktext/60">Traveler</div>
                   </div>
                 </div>
               </Card>
@@ -282,15 +284,15 @@ export default function HomePage() {
                   ))}
                 </div>
                 <p className="font-paragraph text-base text-darktext/80 mb-4">
-                  "Professional, fast, and affordable. I've used EASYFIX for multiple services and they never disappoint!"
+                  "Best travel experience ever! The guide's passion for their destination was contagious. Worth every penny!"
                 </p>
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
                     <Users className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <div className="font-heading text-sm text-darktext">Rajesh Kumar</div>
-                    <div className="font-paragraph text-xs text-darktext/60">Property Manager</div>
+                    <div className="font-heading text-sm text-darktext">Michael Chen</div>
+                    <div className="font-paragraph text-xs text-darktext/60">Adventure Seeker</div>
                   </div>
                 </div>
               </Card>
@@ -303,36 +305,36 @@ export default function HomePage() {
       <section className="relative overflow-hidden">
         <div className="max-w-[120rem] mx-auto">
           <div className="grid lg:grid-cols-2 gap-0">
-            {/* Customer CTA */}
+            {/* Tourist CTA */}
             <div className="bg-primary px-8 lg:px-16 py-20 lg:py-24 flex flex-col justify-center">
               <h2 className="font-heading text-4xl lg:text-5xl text-primary-foreground mb-6">
-                Ready to Get Started?
+                Ready to Explore?
               </h2>
               <p className="font-paragraph text-lg text-primary-foreground/90 mb-8 max-w-xl">
-                Browse our services and book your first appointment today. Quality service is just a click away.
+                Discover amazing travel experiences and book your next adventure with expert guides today.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button asChild size="lg" className="bg-background text-darktext hover:bg-secondary h-14 px-8 text-lg">
-                  <Link to="/services">
-                    Explore Services
+                  <Link to="/experiences">
+                    Browse Experiences
                     <ArrowRight className="ml-2 w-5 h-5" />
                   </Link>
                 </Button>
               </div>
             </div>
 
-            {/* Provider CTA */}
+            {/* Guide CTA */}
             <div className="bg-secondary px-8 lg:px-16 py-20 lg:py-24 flex flex-col justify-center">
               <h2 className="font-heading text-4xl lg:text-5xl text-darktext mb-6">
-                Are You a Professional?
+                Are You an Expert Guide?
               </h2>
               <p className="font-paragraph text-lg text-darktext/70 mb-8 max-w-xl">
-                Join our network of trusted service providers and grow your business with EASYFIX.
+                Share your passion and expertise. Join our community of guides and earn money doing what you love.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 h-14 px-8 text-lg">
-                  <Link to="/provider-registration">
-                    Become a Provider
+                  <Link to="/register-guide">
+                    Become a Guide
                     <ArrowRight className="ml-2 w-5 h-5" />
                   </Link>
                 </Button>

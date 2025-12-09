@@ -11,7 +11,7 @@ export default function Layout() {
 
   const navigation = [
     { name: 'Home', href: '/' },
-    { name: 'Services', href: '/services' },
+    { name: 'Experiences', href: '/experiences' },
     { name: 'About', href: '/about' },
     { name: 'Contact', href: '/contact' },
   ];
@@ -25,9 +25,9 @@ export default function Layout() {
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <span className="font-heading font-bold text-primary-foreground text-sm">EF</span>
+                <span className="font-heading font-bold text-primary-foreground text-sm">GD</span>
               </div>
-              <span className="font-heading text-xl font-bold text-darktext">EASYFIX</span>
+              <span className="font-heading text-xl font-bold text-darktext">Guidaroo</span>
             </Link>
 
             {/* Desktop Navigation */}
@@ -52,8 +52,8 @@ export default function Layout() {
                   <Link to="/bookings" className="font-paragraph text-darktext hover:text-primary transition-colors">
                     My Bookings
                   </Link>
-                  <Link to="/provider-dashboard" className="font-paragraph text-darktext hover:text-primary transition-colors">
-                    Provider Dashboard
+                  <Link to="/guide-dashboard" className="font-paragraph text-darktext hover:text-primary transition-colors">
+                    Guide Dashboard
                   </Link>
                   <Link 
                     to="/profile" 
@@ -77,17 +77,17 @@ export default function Layout() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={actions.login}
+                    asChild
                     className="border-buttonborder text-darktext hover:bg-secondary"
                   >
-                    Sign In
+                    <Link to="/login">Sign In</Link>
                   </Button>
                   <Button
                     asChild
                     size="sm"
                     className="bg-primary text-primary-foreground hover:bg-primary/90"
                   >
-                    <Link to="/provider-registration">Join as Provider</Link>
+                    <Link to="/register-guide">Become a Guide</Link>
                   </Button>
                 </div>
               )}
@@ -131,11 +131,11 @@ export default function Layout() {
                       My Bookings
                     </Link>
                     <Link
-                      to="/provider-dashboard"
+                      to="/guide-dashboard"
                       className="block font-paragraph text-darktext hover:text-primary transition-colors"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Provider Dashboard
+                      Guide Dashboard
                     </Link>
                     <Link
                       to="/profile"
@@ -166,11 +166,11 @@ export default function Layout() {
                       Sign In
                     </button>
                     <Link
-                      to="/provider-registration"
+                      to="/register-guide"
                       className="block font-paragraph text-darktext hover:text-primary transition-colors"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Join as Provider
+                      Become a Guide
                     </Link>
                   </div>
                 )}
@@ -193,25 +193,24 @@ export default function Layout() {
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
                 <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                  <span className="font-heading font-bold text-primary-foreground text-sm">EF</span>
+                  <span className="font-heading font-bold text-primary-foreground text-sm">GD</span>
                 </div>
-                <span className="font-heading text-xl font-bold text-darktext">EASYFIX</span>
+                <span className="font-heading text-xl font-bold text-darktext">Guidaroo</span>
               </div>
               <p className="font-paragraph text-sm text-darktext/70">
-                Professional home services made simple. Connect with verified professionals for all your repair and maintenance needs.
+                Connect with expert guides and discover amazing travel experiences around the world.
               </p>
             </div>
 
-            {/* Services */}
+            {/* Experiences */}
             <div className="space-y-4">
-              <h3 className="font-heading text-lg font-semibold text-darktext">Services</h3>
+              <h3 className="font-heading text-lg font-semibold text-darktext">Experiences</h3>
               <ul className="space-y-2 font-paragraph text-sm text-darktext/70">
-                <li>Electrician</li>
-                <li>Plumber</li>
-                <li>Carpenter</li>
-                <li>AC Technician</li>
-                <li>Cleaner</li>
-                <li>Painter</li>
+                <li>Cultural Tours</li>
+                <li>Adventure Hiking</li>
+                <li>Food & Wine</li>
+                <li>Historical Sites</li>
+                <li>Nature Walks</li>
               </ul>
             </div>
 
@@ -220,8 +219,8 @@ export default function Layout() {
               <h3 className="font-heading text-lg font-semibold text-darktext">Company</h3>
               <ul className="space-y-2 font-paragraph text-sm">
                 <li>
-                  <Link to="/about" className="text-darktext/70 hover:text-primary transition-colors">
-                    About Us
+                  <Link to="/experiences" className="text-darktext/70 hover:text-primary transition-colors">
+                    Browse Experiences
                   </Link>
                 </li>
                 <li>
@@ -230,8 +229,8 @@ export default function Layout() {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/provider-registration" className="text-darktext/70 hover:text-primary transition-colors">
-                    Become a Provider
+                  <Link to="/register-guide" className="text-darktext/70 hover:text-primary transition-colors">
+                    Become a Guide
                   </Link>
                 </li>
               </ul>
@@ -254,7 +253,7 @@ export default function Layout() {
 
           <div className="border-t border-contentblockbackground mt-8 pt-8 text-center">
             <p className="font-paragraph text-sm text-darktext/70">
-              © 2024 EASYFIX. All rights reserved.
+              © 2024 Guidaroo. All rights reserved.
             </p>
           </div>
         </div>

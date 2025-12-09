@@ -7,6 +7,9 @@ import ErrorPage from '@/integrations/errorHandlers/ErrorPage';
 // Import pages
 import Layout from '@/components/Layout';
 import HomePage from '@/components/pages/HomePage';
+import LoginPage from '@/components/pages/LoginPage';
+import TouristRegistrationPage from '@/components/pages/TouristRegistrationPage';
+import GuideRegistrationPage from '@/components/pages/GuideRegistrationPage';
 import ServicesPage from '@/components/pages/ServicesPage';
 import ServiceDetailPage from '@/components/pages/ServiceDetailPage';
 import AboutPage from '@/components/pages/AboutPage';
@@ -40,8 +43,24 @@ const router = createBrowserRouter([
         element: <HomePage />, // MIXED ROUTE: Shows different content for authenticated vs anonymous users
       },
       {
+        path: "login",
+        element: <LoginPage />,
+      },
+      {
+        path: "register-tourist",
+        element: <TouristRegistrationPage />,
+      },
+      {
+        path: "register-guide",
+        element: <GuideRegistrationPage />,
+      },
+      {
         path: "services",
         element: <ServicesPage />,
+      },
+      {
+        path: "experiences",
+        element: <ServicesPage />, // Reusing ServicesPage for experiences
       },
       {
         path: "services/:id",
@@ -90,7 +109,15 @@ const router = createBrowserRouter([
       {
         path: "provider-dashboard",
         element: (
-          <MemberProtectedRoute messageToSignIn="Sign in to access your provider dashboard">
+          <MemberProtectedRoute messageToSignIn="Sign in to access your guide dashboard">
+            <ProviderDashboardPage />
+          </MemberProtectedRoute>
+        ),
+      },
+      {
+        path: "guide-dashboard",
+        element: (
+          <MemberProtectedRoute messageToSignIn="Sign in to access your guide dashboard">
             <ProviderDashboardPage />
           </MemberProtectedRoute>
         ),
