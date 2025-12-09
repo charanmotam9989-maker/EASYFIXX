@@ -2,18 +2,25 @@ import { Outlet, Link } from 'react-router-dom';
 import { useMember } from '@/integrations';
 import { Button } from '@/components/ui/button';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import { Menu, X, User, LogOut } from 'lucide-react';
+import { Menu, X, User, LogOut, Bell } from 'lucide-react';
 import { useState } from 'react';
+import NotificationCenter from '@/components/NotificationCenter';
+import NotificationPanel from '@/components/NotificationPanel';
+import { useNotificationStore } from '@/stores/notificationStore';
 
 export default function Layout() {
   const { member, isAuthenticated, isLoading, actions } = useMember();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [notificationPanelOpen, setNotificationPanelOpen] = useState(false);
+  const { notifications } = useNotificationStore();
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   const navigation = [
-    { name: 'Home', href: '/' },
-    { name: 'Experiences', href: '/experiences' },
-    { name: 'About', href: '/about' },
-    { name: 'Contact', href: '/contact' },
+    { name: 'Adventure', href: '/' },
+    { name: 'Tour', href: '/experiences' },
+    { name: 'Journey', href: '/about' },
+    { name: 'Quest', href: '/contact' },
+    { name: 'Expedition', href: '/reviews' },
   ];
 
   return (
@@ -49,6 +56,17 @@ export default function Layout() {
                 <LoadingSpinner />
               ) : isAuthenticated ? (
                 <div className="flex items-center space-x-4">
+                  <button
+                    onClick={() => setNotificationPanelOpen(true)}
+                    className="relative p-2 text-darktext hover:text-primary transition-colors"
+                  >
+                    <Bell className="w-5 h-5" />
+                    {unreadCount > 0 && (
+                      <span className="absolute top-0 right-0 w-5 h-5 bg-accent-orange text-white text-xs rounded-full flex items-center justify-center">
+                        {unreadCount}
+                      </span>
+                    )}
+                  </button>
                   <Link to="/bookings" className="font-paragraph text-darktext hover:text-primary transition-colors">
                     My Bookings
                   </Link>
@@ -184,6 +202,12 @@ export default function Layout() {
       <main>
         <Outlet />
       </main>
+
+      {/* Notification Center */}
+      <NotificationCenter />
+      
+      {/* Notification Panel */}
+      <NotificationPanel isOpen={notificationPanelOpen} onClose={() => setNotificationPanelOpen(false)} />
 
       {/* Footer */}
       <footer className="bg-secondary border-t border-contentblockbackground">

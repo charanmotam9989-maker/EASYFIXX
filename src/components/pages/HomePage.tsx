@@ -1,14 +1,85 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { MapPin, Shield, Star, Clock, ArrowRight, CheckCircle2, Zap, Users, Compass, Globe, Sparkles } from 'lucide-react';
 import { useMember } from '@/integrations';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { Image } from '@/components/ui/image';
 import { motion } from 'framer-motion';
+import { MapPin, Star, Users, Zap, ArrowRight, MapPinIcon } from 'lucide-react';
+import { BaseCrudService } from '@/integrations';
+import { Services, ServiceProviders } from '@/entities';
+import { useGeolocation, calculateDistance } from '@/hooks/useGeolocation';
+import { useNotificationStore } from '@/stores/notificationStore';
 
 export default function HomePage() {
-  const { isAuthenticated, actions, member } = useMember();
+  const { member, isAuthenticated } = useMember();
+  const { coordinates, requestLocation } = useGeolocation();
+  const { addNotification } = useNotificationStore();
+  const [services, setServices] = useState<Services[]>([]);
+  const [guides, setGuides] = useState<ServiceProviders[]>([]);
+  const [nearbyGuides, setNearbyGuides] = useState<ServiceProviders[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [servicesData, guidesData] = await Promise.all([
+          BaseCrudService.getAll<Services>('services'),
+          BaseCrudService.getAll<ServiceProviders>('serviceproviders'),
+        ]);
+        setServices(servicesData.items || []);
+        setGuides(guidesData.items || []);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Mock coordinates for demo (Paris, France)
+  const demoLat = 48.8566;
+  const demoLon = 2.3522;
+
+  useEffect(() => {
+    if (guides.length > 0) {
+      // Filter guides within 50km radius
+      const nearby = guides.filter((guide) => {
+        // Mock location coordinates for demo
+        const guideCoords = {
+          'Paris': { lat: 48.8566, lon: 2.3522 },
+          'London': { lat: 51.5074, lon: -0.1278 },
+          'Barcelona': { lat: 41.3874, lon: 2.1686 },
+          'Amsterdam': { lat: 52.3676, lon: 4.9041 },
+          'Rome': { lat: 41.9028, lon: 12.4964 },
+          'Berlin': { lat: 52.52, lon: 13.405 },
+          'Madrid': { lat: 40.4168, lon: -3.7038 },
+          'Vienna': { lat: 48.2082, lon: 16.3738 },
+          'Prague': { lat: 50.0755, lon: 14.4378 },
+          'Venice': { lat: 45.4408, lon: 12.3155 },
+          'Athens': { lat: 37.9838, lon: 23.7275 },
+          'Istanbul': { lat: 41.0082, lon: 28.9784 },
+        };
+
+        const location = guide.location || 'Paris';
+        const coords = guideCoords[location as keyof typeof guideCoords] || { lat: demoLat, lon: demoLon };
+        const distance = calculateDistance(demoLat, demoLon, coords.lat, coords.lon);
+        return distance <= 50;
+      });
+      setNearbyGuides(nearby);
+    }
+  }, [guides]);
+
+  const handleLocationRequest = () => {
+    requestLocation();
+    addNotification({
+      type: 'info',
+      title: 'Location Requested',
+      message: 'Requesting your location to find nearby guides...',
+    });
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -31,418 +102,270 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-background overflow-hidden">
-      {/* Animated Hero Section */}
-      <section className="relative w-full max-w-[120rem] mx-auto overflow-hidden">
-        {/* Animated Background Elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <motion.div
-            className="absolute top-0 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl"
-            animate={{ y: [0, 50, 0], x: [0, 30, 0] }}
-            transition={{ duration: 10, repeat: Infinity }}
-          />
-          <motion.div
-            className="absolute bottom-0 right-1/4 w-96 h-96 bg-secondary/20 rounded-full blur-3xl"
-            animate={{ y: [0, -50, 0], x: [0, -30, 0] }}
-            transition={{ duration: 12, repeat: Infinity }}
-          />
-        </div>
-
-        <div className="grid lg:grid-cols-2 gap-0 min-h-[90vh] relative z-10">
-          {/* Left Content */}
-          <motion.div
-            className="flex flex-col justify-center px-8 lg:px-16 py-20 lg:py-32 bg-gradient-to-br from-primary/5 via-background to-secondary/30"
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-            >
-              <Badge className="w-fit mb-6 bg-primary/10 text-primary border-primary/20 hover:bg-primary/20">
-                <Sparkles className="w-3 h-3 mr-2" />
-                Discover Amazing Travel Experiences
-              </Badge>
-            </motion.div>
-
-            <motion.h1
-              className="font-heading text-5xl lg:text-7xl text-darktext mb-6 leading-tight"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-            >
-              Explore the World
-              <span className="block text-primary mt-2">With Expert Guides</span>
-            </motion.h1>
-
-            <motion.p
-              className="font-paragraph text-xl text-darktext/70 mb-10 max-w-xl"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-            >
-              Connect with passionate local guides and discover unique travel experiences.
-              Authentic adventures, verified guides, unforgettable memories.
-            </motion.p>
-
-            <motion.div
-              className="flex flex-col sm:flex-row gap-4"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-            >
-              <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 h-14 px-8 text-lg">
-                <Link to="/experiences">
-                  Browse Experiences
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
-              </Button>
-              {!isAuthenticated && (
-                <Button
-                  variant="outline"
-                  size="lg"
-                  asChild
-                  className="border-2 border-buttonborder text-darktext hover:bg-secondary h-14 px-8 text-lg"
-                >
-                  <Link to="/login">
-                    Sign In
-                  </Link>
-                </Button>
-              )}
-            </motion.div>
-
-            {/* Stats */}
-            <motion.div
-              className="grid grid-cols-3 gap-6 mt-16 pt-10 border-t border-darktext/10"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.5 }}
-            >
-              {[
-                { value: '1000+', label: 'Expert Guides' },
-                { value: '4.9★', label: 'Avg Rating' },
-                { value: '50+', label: 'Destinations' },
-              ].map((stat, idx) => (
-                <motion.div
-                  key={idx}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.6 + idx * 0.1 }}
-                >
-                  <div className="font-heading text-3xl text-primary mb-1">{stat.value}</div>
-                  <div className="font-paragraph text-sm text-darktext/60">{stat.label}</div>
-                </motion.div>
-              ))}
-            </motion.div>
-          </motion.div>
-
-          {/* Right Visual */}
-          <motion.div
-            className="relative bg-gradient-to-br from-secondary to-primary/10 flex items-center justify-center p-12"
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-          >
-            <div className="relative w-full h-full flex items-center justify-center">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                transition={{ duration: 0.3 }}
-              >
-                <Image
-                  src="https://static.wixstatic.com/media/127917_94e286ce3b9f4eef97357be2d0fb2300~mv2.png?originWidth=768&originHeight=576"
-                  alt="Expert travel guide leading a group of tourists"
-                  className="w-full h-full object-cover rounded-2xl"
-                  width={800}
-                />
-              </motion.div>
-
-              {/* Floating Card */}
-              <motion.div
-                className="absolute bottom-8 left-8 right-8 bg-background p-6 rounded-xl shadow-2xl border border-primary/10"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.6 }}
-                whileHover={{ y: -5 }}
-              >
-                <div className="flex items-center gap-4">
-                  <motion.div
-                    className="w-12 h-12 bg-primary rounded-full flex items-center justify-center"
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 20, repeat: Infinity }}
-                  >
-                    <Compass className="w-6 h-6 text-primary-foreground" />
-                  </motion.div>
-                  <div>
-                    <div className="font-heading text-lg text-darktext">Instant Booking</div>
-                    <div className="font-paragraph text-sm text-darktext/60">Reserve your adventure in minutes</div>
-                  </div>
-                </div>
-              </motion.div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Features Section - Asymmetric Grid */}
-      <section className="py-24 bg-background">
-        <div className="max-w-[100rem] mx-auto px-8">
-          <motion.div
-            className="grid lg:grid-cols-12 gap-12 items-center mb-16"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-          >
-            <motion.div
-              className="lg:col-span-5"
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-            >
-              <h2 className="font-heading text-4xl lg:text-5xl text-darktext mb-6">
-                Why Choose Guidaroo
-              </h2>
-              <p className="font-paragraph text-lg text-darktext/70">
-                We connect travelers with passionate local guides for authentic, unforgettable experiences
-              </p>
-            </motion.div>
-            <motion.div
-              className="lg:col-span-7"
-              variants={containerVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-            >
-              <div className="grid sm:grid-cols-2 gap-6">
-                {[
-                  { icon: Shield, title: 'Verified Guides', desc: 'All guides are background-checked with proven expertise' },
-                  { icon: Star, title: 'Quality Experiences', desc: 'Curated travel experiences with authentic local insights' },
-                  { icon: Zap, title: 'Easy Booking', desc: 'Book your adventure in seconds with instant confirmation' },
-                  { icon: Globe, title: 'Global Reach', desc: 'Explore 50+ destinations with expert local guides' },
-                ].map((feature, idx) => (
-                  <motion.div key={idx} variants={itemVariants}>
-                    <Card className="border-2 border-primary/10 hover:border-primary/30 transition-all hover:shadow-lg p-6 h-full">
-                      <motion.div
-                        className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mb-5"
-                        whileHover={{ scale: 1.1, rotate: 5 }}
-                      >
-                        <feature.icon className="w-7 h-7 text-primary" />
-                      </motion.div>
-                      <h3 className="font-heading text-xl text-darktext mb-3">{feature.title}</h3>
-                      <p className="font-paragraph text-base text-darktext/70">
-                        {feature.desc}
-                      </p>
-                    </Card>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* How It Works - Horizontal Flow */}
-      <section className="py-24 bg-secondary/30">
-        <div className="max-w-[100rem] mx-auto px-8">
-          <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-          >
-            <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">Simple Process</Badge>
-            <h2 className="font-heading text-4xl lg:text-5xl text-darktext mb-6">
-              Book Your Adventure in 3 Steps
-            </h2>
-            <p className="font-paragraph text-lg text-darktext/70 max-w-2xl mx-auto">
-              From discovery to adventure - get started in minutes
+    <div className="min-h-screen bg-gradient-to-br from-white via-blue-50 to-purple-50">
+      {/* Hero Section */}
+      <section className="w-full max-w-[120rem] mx-auto px-6 py-20 md:py-32">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-center space-y-8"
+        >
+          <div className="space-y-4">
+            <h1 className="font-heading text-5xl md:text-7xl font-bold text-darktext">
+              Discover Unforgettable <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-blue via-accent-purple to-accent-pink">Adventures</span>
+            </h1>
+            <p className="font-paragraph text-xl text-darktext/70 max-w-2xl mx-auto">
+              Connect with expert guides and explore the world's most amazing destinations. From mountain peaks to hidden gems, your next adventure awaits.
             </p>
-          </motion.div>
+          </div>
 
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button
+              asChild
+              size="lg"
+              className="bg-gradient-to-r from-accent-blue to-accent-purple text-white hover:shadow-lg transition-shadow"
+            >
+              <Link to="/experiences" className="flex items-center gap-2">
+                Explore Experiences
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              onClick={handleLocationRequest}
+              className="border-2 border-accent-teal text-accent-teal hover:bg-accent-teal/10"
+            >
+              <MapPinIcon className="w-5 h-5 mr-2" />
+              Find Nearby Guides
+            </Button>
+          </div>
+
+          {/* Stats */}
           <motion.div
-            className="grid md:grid-cols-3 gap-8 relative"
             variants={containerVariants}
             initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
+            animate="visible"
+            className="grid grid-cols-3 gap-4 md:gap-8 mt-16 pt-16 border-t border-gray-200"
           >
-            {/* Connector Lines */}
-            <div className="hidden md:block absolute top-12 left-1/6 right-1/6 h-1 bg-gradient-to-r from-primary via-primary to-primary opacity-20" style={{ top: '4rem' }}></div>
-
             {[
-              { num: 1, title: 'Explore Experiences', items: ['Filter by destination', 'Read guide reviews'] },
-              { num: 2, title: 'Book Your Spot', items: ['Flexible scheduling', 'Instant confirmation'] },
-              { num: 3, title: 'Enjoy Your Adventure', items: ['Expert guidance', 'Unforgettable memories'] },
-            ].map((step, idx) => (
-              <motion.div key={idx} variants={itemVariants}>
-                <motion.div
-                  className="bg-background rounded-2xl p-8 border-2 border-primary/10 hover:border-primary/30 transition-all"
-                  whileHover={{ y: -5 }}
-                >
-                  <motion.div
-                    className="w-20 h-20 bg-primary text-primary-foreground rounded-2xl flex items-center justify-center mb-6 font-heading text-3xl shadow-lg"
-                    whileHover={{ scale: 1.1, rotate: 5 }}
-                  >
-                    {step.num}
-                  </motion.div>
-                  <h3 className="font-heading text-2xl text-darktext mb-4">{step.title}</h3>
-                  <p className="font-paragraph text-base text-darktext/70 mb-6">
-                    {step.num === 1 && 'Browse our collection of unique travel experiences'}
-                    {step.num === 2 && 'Choose your date and secure your booking instantly'}
-                    {step.num === 3 && 'Experience authentic travel with your expert guide'}
-                  </p>
-                  <ul className="space-y-2">
-                    {step.items.map((item, i) => (
-                      <li key={i} className="flex items-center gap-2 font-paragraph text-sm text-darktext/70">
-                        <CheckCircle2 className="w-4 h-4 text-primary" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </motion.div>
+              { icon: Users, label: 'Active Guides', value: guides.length },
+              { icon: Zap, label: 'Experiences', value: services.length },
+              { icon: Star, label: 'Avg Rating', value: '4.8' },
+            ].map((stat, idx) => (
+              <motion.div key={idx} variants={itemVariants} className="text-center">
+                <stat.icon className="w-8 h-8 mx-auto mb-2 text-accent-orange" />
+                <p className="font-heading text-2xl md:text-3xl font-bold text-darktext">{stat.value}</p>
+                <p className="font-paragraph text-sm text-darktext/60">{stat.label}</p>
               </motion.div>
             ))}
           </motion.div>
-        </div>
+        </motion.div>
       </section>
 
-      {/* Social Proof Section */}
-      <section className="py-24 bg-background">
-        <div className="max-w-[100rem] mx-auto px-8">
+      {/* Nearby Guides Section */}
+      {nearbyGuides.length > 0 && (
+        <section className="w-full max-w-[120rem] mx-auto px-6 py-20">
           <motion.div
-            className="grid lg:grid-cols-2 gap-16 items-center"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
+            className="space-y-12"
           >
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-            >
-              <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">Testimonials</Badge>
-              <h2 className="font-heading text-4xl lg:text-5xl text-darktext mb-6">
-                Loved by Travelers Worldwide
+            <div className="text-center space-y-4">
+              <h2 className="font-heading text-4xl md:text-5xl font-bold text-darktext">
+                Guides Near You
               </h2>
-              <p className="font-paragraph text-lg text-darktext/70 mb-8">
-                Join thousands of satisfied travelers who've discovered amazing experiences with Guidaroo
+              <p className="font-paragraph text-lg text-darktext/60 max-w-2xl mx-auto">
+                Discover amazing guides in your area ready to show you the best experiences
               </p>
-              <Button asChild size="lg" variant="outline" className="border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground">
-                <Link to="/reviews">
-                  Read All Reviews
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
-              </Button>
-            </motion.div>
+            </div>
 
             <motion.div
-              className="space-y-6"
               variants={containerVariants}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true }}
+              className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
             >
-              {[
-                {
-                  text: '"Amazing experience! Our guide was so knowledgeable and made the entire trip unforgettable. Highly recommend Guidaroo!"',
-                  name: 'Sarah Johnson',
-                  role: 'Traveler'
-                },
-                {
-                  text: '"Best travel experience ever! The guide\'s passion for their destination was contagious. Worth every penny!"',
-                  name: 'Michael Chen',
-                  role: 'Adventure Seeker'
-                }
-              ].map((review, idx) => (
-                <motion.div key={idx} variants={itemVariants}>
-                  <Card className="p-6 border-2 border-primary/10 hover:shadow-lg transition-all">
-                    <div className="flex gap-1 mb-4">
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} className="w-5 h-5 fill-primary text-primary" />
-                      ))}
+              {nearbyGuides.slice(0, 6).map((guide) => (
+                <motion.div key={guide._id} variants={itemVariants}>
+                  <Card className="overflow-hidden hover:shadow-xl transition-shadow duration-300 border-0 bg-white">
+                    <div className="aspect-square bg-gradient-to-br from-accent-blue to-accent-purple flex items-center justify-center">
+                      {guide.profilePicture ? (
+                        <Image
+                          src={guide.profilePicture}
+                          alt={guide.providerName || 'Guide'}
+                          width={300}
+                          height={300}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <Users className="w-16 h-16 text-white/50" />
+                      )}
                     </div>
-                    <p className="font-paragraph text-base text-darktext/80 mb-4">
-                      {review.text}
-                    </p>
-                    <div className="flex items-center gap-3">
-                      <motion.div
-                        className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center"
-                        whileHover={{ scale: 1.1 }}
-                      >
-                        <Users className="w-5 h-5 text-primary" />
-                      </motion.div>
+                    <div className="p-6 space-y-4">
                       <div>
-                        <div className="font-heading text-sm text-darktext">{review.name}</div>
-                        <div className="font-paragraph text-xs text-darktext/60">{review.role}</div>
+                        <h3 className="font-heading text-xl font-bold text-darktext">{guide.providerName}</h3>
+                        <div className="flex items-center gap-2 mt-2 text-sm text-darktext/60">
+                          <MapPin className="w-4 h-4 text-accent-orange" />
+                          {guide.location || 'Location TBA'}
+                        </div>
                       </div>
+
+                      <p className="font-paragraph text-sm text-darktext/70 line-clamp-2">{guide.bio}</p>
+
+                      <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                        <div className="flex items-center gap-1">
+                          <Star className="w-4 h-4 fill-accent-orange text-accent-orange" />
+                          <span className="font-heading font-bold text-darktext">{guide.rating || 5.0}</span>
+                        </div>
+                        <span className="font-paragraph text-xs text-darktext/60">
+                          {guide.yearsOfExperience} yrs exp
+                        </span>
+                      </div>
+
+                      <Button
+                        asChild
+                        className="w-full bg-gradient-to-r from-accent-blue to-accent-purple text-white hover:shadow-lg"
+                      >
+                        <Link to="/experiences">View Services</Link>
+                      </Button>
                     </div>
                   </Card>
                 </motion.div>
               ))}
             </motion.div>
           </motion.div>
-        </div>
+        </section>
+      )}
+
+      {/* Featured Experiences Section */}
+      <section className="w-full max-w-[120rem] mx-auto px-6 py-20 bg-gradient-to-r from-accent-blue/5 to-accent-purple/5 rounded-3xl">
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.6 }}
+          className="space-y-12"
+        >
+          <div className="text-center space-y-4">
+            <h2 className="font-heading text-4xl md:text-5xl font-bold text-darktext">
+              Featured Experiences
+            </h2>
+            <p className="font-paragraph text-lg text-darktext/60 max-w-2xl mx-auto">
+              Handpicked adventures curated by our expert guides
+            </p>
+          </div>
+
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            className="grid md:grid-cols-2 gap-6"
+          >
+            {services.slice(0, 4).map((service) => (
+              <motion.div key={service._id} variants={itemVariants}>
+                <Link to={`/services/${service._id}`}>
+                  <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 border-0 bg-white group cursor-pointer">
+                    <div className="aspect-video bg-gradient-to-br from-accent-orange to-accent-pink overflow-hidden">
+                      {service.serviceImage ? (
+                        <Image
+                          src={service.serviceImage}
+                          alt={service.serviceName || 'Experience'}
+                          width={500}
+                          height={300}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <Zap className="w-12 h-12 text-white/50" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-6 space-y-4">
+                      <div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="px-3 py-1 bg-accent-blue/10 text-accent-blue text-xs font-semibold rounded-full">
+                            {service.serviceType}
+                          </span>
+                          <span className="px-3 py-1 bg-accent-purple/10 text-accent-purple text-xs font-semibold rounded-full">
+                            {service.difficultyLevel}
+                          </span>
+                        </div>
+                        <h3 className="font-heading text-xl font-bold text-darktext group-hover:text-accent-blue transition-colors">
+                          {service.serviceName}
+                        </h3>
+                      </div>
+
+                      <p className="font-paragraph text-sm text-darktext/70 line-clamp-2">{service.summary}</p>
+
+                      <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                        <div className="flex items-center gap-2">
+                          <MapPin className="w-4 h-4 text-accent-orange" />
+                          <span className="font-paragraph text-sm text-darktext/60">{service.destination}</span>
+                        </div>
+                        <span className="font-heading font-bold text-accent-orange">
+                          ${service.startingPrice}
+                        </span>
+                      </div>
+                    </div>
+                  </Card>
+                </Link>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          <div className="text-center pt-8">
+            <Button
+              asChild
+              size="lg"
+              className="bg-gradient-to-r from-accent-blue to-accent-purple text-white hover:shadow-lg"
+            >
+              <Link to="/experiences" className="flex items-center gap-2">
+                View All Experiences
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+            </Button>
+          </div>
+        </motion.div>
       </section>
 
-      {/* CTA Section - Split Design */}
-      <section className="relative overflow-hidden">
-        <div className="max-w-[120rem] mx-auto">
-          <div className="grid lg:grid-cols-2 gap-0">
-            {/* Tourist CTA */}
-            <motion.div
-              className="bg-primary px-8 lg:px-16 py-20 lg:py-24 flex flex-col justify-center"
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
+      {/* CTA Section */}
+      <section className="w-full max-w-[120rem] mx-auto px-6 py-20">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="bg-gradient-to-r from-accent-blue via-accent-purple to-accent-pink rounded-3xl p-12 md:p-20 text-center space-y-8 text-white"
+        >
+          <h2 className="font-heading text-4xl md:text-5xl font-bold">
+            Ready to Start Your Adventure?
+          </h2>
+          <p className="font-paragraph text-lg opacity-90 max-w-2xl mx-auto">
+            {isAuthenticated
+              ? `Welcome back, ${member?.profile?.nickname}! Explore new experiences and book your next adventure.`
+              : 'Join thousands of travelers discovering amazing experiences with expert guides around the world.'}
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button
+              asChild
+              size="lg"
+              className="bg-white text-accent-blue hover:bg-gray-100 font-semibold"
             >
-              <h2 className="font-heading text-4xl lg:text-5xl text-primary-foreground mb-6">
-                Ready to Explore?
-              </h2>
-              <p className="font-paragraph text-lg text-primary-foreground/90 mb-8 max-w-xl">
-                Discover amazing travel experiences and book your next adventure with expert guides today.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button asChild size="lg" className="bg-background text-darktext hover:bg-secondary h-14 px-8 text-lg">
-                  <Link to="/experiences">
-                    Browse Experiences
-                    <ArrowRight className="ml-2 w-5 h-5" />
-                  </Link>
-                </Button>
-              </div>
-            </motion.div>
-
-            {/* Guide CTA */}
-            <motion.div
-              className="bg-secondary px-8 lg:px-16 py-20 lg:py-24 flex flex-col justify-center"
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-            >
-              <h2 className="font-heading text-4xl lg:text-5xl text-darktext mb-6">
-                Are You an Expert Guide?
-              </h2>
-              <p className="font-paragraph text-lg text-darktext/70 mb-8 max-w-xl">
-                Share your passion and expertise. Join our community of guides and earn money doing what you love.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 h-14 px-8 text-lg">
-                  <Link to="/register-guide">
-                    Become a Guide
-                    <ArrowRight className="ml-2 w-5 h-5" />
-                  </Link>
-                </Button>
-              </div>
-            </motion.div>
+              <Link to="/experiences">Browse Experiences</Link>
+            </Button>
+            {!isAuthenticated && (
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="border-2 border-white text-white hover:bg-white/10"
+              >
+                <Link to="/register-tourist">Sign Up as Tourist</Link>
+              </Button>
+            )}
           </div>
-        </div>
+        </motion.div>
       </section>
     </div>
   );

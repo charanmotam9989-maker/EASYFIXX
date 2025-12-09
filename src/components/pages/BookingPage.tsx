@@ -16,6 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import { CalendarIcon, Clock, MapPin, User, ArrowLeft, Map } from 'lucide-react';
 import { format } from 'date-fns';
 import { Image } from '@/components/ui/image';
+import { useNotificationStore } from '@/stores/notificationStore';
 
 export default function BookingPage() {
   const { id } = useParams<{ id: string }>();
@@ -23,6 +24,7 @@ export default function BookingPage() {
   const navigate = useNavigate();
   const { member } = useMember();
   const { toast } = useToast();
+  const { addNotification } = useNotificationStore();
   
   const [service, setService] = useState<Services | null>(null);
   const [providers, setProviders] = useState<ServiceProviders[]>([]);
@@ -189,6 +191,13 @@ export default function BookingPage() {
       } as ServiceBookings;
 
       await BaseCrudService.create('servicebookings', newBooking);
+      
+      // Add notification to store
+      addNotification({
+        type: 'success',
+        title: 'Booking Confirmed!',
+        message: `Your booking for ${service?.serviceName} has been confirmed.`,
+      });
       
       // Send notification email to provider
       if (selectedProviderData?.email) {

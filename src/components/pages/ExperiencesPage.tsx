@@ -1,24 +1,28 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { BaseCrudService } from '@/integrations';
-import { Services } from '@/entities';
+import { Services, ServiceProviders } from '@/entities';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import { Search, Filter, MapPin, Clock, Zap, TrendingUp } from 'lucide-react';
+import { Search, Filter, MapPin, Clock, Zap, TrendingUp, Star, Users } from 'lucide-react';
 import { Image } from '@/components/ui/image';
 import { motion } from 'framer-motion';
+import { useGeolocation, calculateDistance } from '@/hooks/useGeolocation';
 
 export default function ExperiencesPage() {
   const [experiences, setExperiences] = useState<Services[]>([]);;
+  const [guides, setGuides] = useState<ServiceProviders[]>([]);
   const [filteredExperiences, setFilteredExperiences] = useState<Services[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDestination, setSelectedDestination] = useState<string>('all');
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
+  const [selectedGuide, setSelectedGuide] = useState<string>('all');
+  const { coordinates } = useGeolocation();
 
   useEffect(() => {
     loadExperiences();
@@ -26,12 +30,16 @@ export default function ExperiencesPage() {
 
   useEffect(() => {
     filterExperiences();
-  }, [experiences, searchTerm, selectedDestination, selectedDifficulty]);
+  }, [experiences, guides, searchTerm, selectedDestination, selectedDifficulty, selectedGuide]);
 
   const loadExperiences = async () => {
     try {
-      const { items } = await BaseCrudService.getAll<Services>('services');
-      setExperiences(items);
+      const [servicesData, guidesData] = await Promise.all([
+        BaseCrudService.getAll<Services>('services'),
+        BaseCrudService.getAll<ServiceProviders>('serviceproviders'),
+      ]);
+      setExperiences(servicesData.items || []);
+      setGuides(guidesData.items || []);
     } catch (error) {
       console.error('Error loading experiences:', error);
     } finally {
@@ -58,11 +66,16 @@ export default function ExperiencesPage() {
       filtered = filtered.filter(exp => exp.difficultyLevel === selectedDifficulty);
     }
 
+    if (selectedGuide !== 'all') {
+      filtered = filtered.filter(exp => exp.guideReference === selectedGuide);
+    }
+
     setFilteredExperiences(filtered);
   };
 
   const destinations = Array.from(new Set(experiences.map(exp => exp.destination).filter(Boolean)));
   const difficulties = Array.from(new Set(experiences.map(exp => exp.difficultyLevel).filter(Boolean)));
+  const guideNames = Array.from(new Set(guides.map(g => g.providerName).filter(Boolean)));
 
   const getDifficultyColor = (difficulty?: string) => {
     switch(difficulty?.toLowerCase()) {
@@ -104,15 +117,15 @@ export default function ExperiencesPage() {
   return (
     <div className="min-h-screen bg-background overflow-hidden">
       {/* Animated Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary/10 via-background to-secondary/20 py-20 overflow-hidden">
+      <section className="relative bg-gradient-to-br from-accent-blue/10 via-background to-accent-purple/10 py-20 overflow-hidden">
         <div className="absolute inset-0 overflow-hidden">
           <motion.div
-            className="absolute top-10 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl"
+            className="absolute top-10 left-10 w-72 h-72 bg-accent-blue/10 rounded-full blur-3xl"
             animate={{ y: [0, 30, 0], x: [0, 20, 0] }}
             transition={{ duration: 8, repeat: Infinity }}
           />
           <motion.div
-            className="absolute bottom-10 right-10 w-96 h-96 bg-secondary/20 rounded-full blur-3xl"
+            className="absolute bottom-10 right-10 w-96 h-96 bg-accent-purple/10 rounded-full blur-3xl"
             animate={{ y: [0, -30, 0], x: [0, -20, 0] }}
             transition={{ duration: 10, repeat: Infinity }}
           />
@@ -132,7 +145,7 @@ export default function ExperiencesPage() {
               transition={{ duration: 0.6, delay: 0.1 }}
             >
               Discover Unforgettable
-              <span className="block text-primary mt-2">Travel Experiences</span>
+              <span className="block bg-gradient-to-r from-accent-blue via-accent-purple to-accent-pink bg-clip-text text-transparent mt-2">Travel Experiences</span>
             </motion.h1>
             <motion.p
               className="font-paragraph text-lg text-darktext/70 mb-8"
@@ -317,7 +330,7 @@ export default function ExperiencesPage() {
 
       {/* Stats Section */}
       <motion.section
-        className="bg-gradient-to-r from-primary to-primary/80 py-16"
+        className="bg-gradient-to-r from-accent-blue via-accent-purple to-accent-pink py-16"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         transition={{ duration: 0.6 }}
@@ -337,11 +350,11 @@ export default function ExperiencesPage() {
                 transition={{ duration: 0.5, delay: idx * 0.1 }}
                 viewport={{ once: true }}
               >
-                <stat.icon className="w-8 h-8 text-primary-foreground mx-auto mb-3" />
-                <div className="font-heading text-3xl text-primary-foreground mb-1">
+                <stat.icon className="w-8 h-8 text-white mx-auto mb-3" />
+                <div className="font-heading text-3xl text-white mb-1">
                   {stat.value}+
                 </div>
-                <div className="font-paragraph text-primary-foreground/80">
+                <div className="font-paragraph text-white/80">
                   {stat.label}
                 </div>
               </motion.div>
